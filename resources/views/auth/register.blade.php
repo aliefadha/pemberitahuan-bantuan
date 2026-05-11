@@ -34,6 +34,21 @@
             </div>
 
             <div>
+                <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong</label>
+                <select id="jorong" name="jorong"
+                    class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('jorong') border-red-500 @enderror">
+                    <option value="">Pilih Jorong</option>
+                    <option value="padang_rantang" {{ old('jorong') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                    <option value="pulutan" {{ old('jorong') == 'pulutan' ? 'selected' : '' }}>Pulutan</option>
+                    <option value="koto_tuo" {{ old('jorong') == 'koto_tuo' ? 'selected' : '' }}>Koto Tuo</option>
+                    <option value="tanjung_pati" {{ old('jorong') == 'tanjung_pati' ? 'selected' : '' }}>Tanjung Pati</option>
+                </select>
+                @error('jorong')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">No. HP (WhatsApp)</label>
                 <input type="text" id="no_telepon" name="no_telepon" value="{{ old('no_telepon') }}" autocomplete="tel"
                     class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('no_telepon') border-red-500 @enderror"

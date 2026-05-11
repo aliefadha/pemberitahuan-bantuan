@@ -8,7 +8,7 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto mb-6">
+    <div class="max-w-7xl mx-auto mb-6">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="px-8 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-800">Form Edit User</h3>
@@ -79,6 +79,47 @@
                             <input type="password" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500" id="password_confirmation" name="password_confirmation">
                         </div>
                     </div>
+
+                    @if($user->role === 'peserta')
+                    <div class="border-t border-gray-200 pt-6 mt-6">
+                        <h4 class="text-base font-semibold text-gray-800 mb-4">Data Bio Peserta</h4>
+                        <div class="space-y-6">
+                            @foreach($sections as $section)
+                                <div class="border border-gray-200 rounded-lg p-6">
+                                    <h5 class="text-sm font-semibold text-gray-700 mb-4">{{ $section['title'] }}</h5>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        @foreach($section['questions'] as $q)
+                                            <div>
+                                                <label for="bio_data_{{ $q['key'] }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                                    {{ $q['question'] }}
+                                                </label>
+
+                                                @if($q['type'] === 'integer')
+                                                    <input type="number"
+                                                        id="bio_data_{{ $q['key'] }}"
+                                                        name="bio_data[{{ $q['key'] }}]"
+                                                        value="{{ old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') }}"
+                                                        @isset($q['min']) min="{{ $q['min'] }}" @endisset
+                                                        @isset($q['max']) max="{{ $q['max'] }}" @endisset
+                                                        class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500"
+                                                        placeholder="0">
+                                                @elseif($q['type'] === 'boolean')
+                                                    <select id="bio_data_{{ $q['key'] }}"
+                                                        name="bio_data[{{ $q['key'] }}]"
+                                                        class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500">
+                                                        <option value="">Pilih</option>
+                                                        <option value="1" {{ old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') == '1' ? 'selected' : '' }}>Ya</option>
+                                                        <option value="0" {{ old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') == '0' ? 'selected' : '' }}>Tidak</option>
+                                                    </select>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="pt-4 flex items-center gap-3">
                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">

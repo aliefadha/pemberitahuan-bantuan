@@ -36,7 +36,10 @@ class KegiatanController extends Controller
             'tanggal' => $request->tanggal,
         ]);
 
-        $usersToNotify = User::where('id', '!=', auth()->id())->get();
+        $usersToNotify = User::where('id', '!=', auth()->id())
+            ->whereNotNull('bio_data')
+            ->where('bio_data', '!=', '[]')
+            ->get();
         foreach ($usersToNotify as $user) {
             $user->notify(new KegiatanNotification($kegiatan, 'created'));
         }
@@ -53,7 +56,10 @@ class KegiatanController extends Controller
 
     public function notify(Kegiatan $kegiatan)
     {
-        $usersToNotify = User::where('id', '!=', auth()->id())->get();
+        $usersToNotify = User::where('id', '!=', auth()->id())
+            ->whereNotNull('bio_data')
+            ->where('bio_data', '!=', '[]')
+            ->get();
         foreach ($usersToNotify as $user) {
             $user->notify(new KegiatanNotification($kegiatan, 'created'));
         }

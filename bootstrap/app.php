@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureBioDataFilled;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsPeserta;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
             'peserta' => EnsureUserIsPeserta::class,
+            'bio_filled' => EnsureBioDataFilled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
