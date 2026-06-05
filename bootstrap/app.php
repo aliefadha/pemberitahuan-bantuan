@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'peserta' => EnsureUserIsPeserta::class,
             'bio_filled' => EnsureBioDataFilled::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'logout',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
