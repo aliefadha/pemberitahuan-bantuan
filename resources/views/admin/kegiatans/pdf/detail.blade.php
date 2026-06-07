@@ -278,11 +278,6 @@
                         <td>{{ now()->format('Y') }}/KEG/{{ $kegiatan->id }}/{{ now()->format('m/Y') }}</td>
                     </tr>
                     <tr>
-                        <td>Sifat</td>
-                        <td>:</td>
-                        <td>Biasa</td>
-                    </tr>
-                    <tr>
                         <td>Lampiran</td>
                         <td>:</td>
                         <td>1 (satu) berkas</td>

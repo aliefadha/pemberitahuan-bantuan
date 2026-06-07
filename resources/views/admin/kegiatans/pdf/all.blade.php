@@ -219,11 +219,6 @@
                         <td>{{ now()->format('Y') }}/KEG/{{ str_pad(1, 3, '0', STR_PAD_LEFT) }}/{{ now()->format('m/Y') }}</td>
                     </tr>
                     <tr>
-                        <td>Sifat</td>
-                        <td>:</td>
-                        <td>Biasa</td>
-                    </tr>
-                    <tr>
                         <td>Lampiran</td>
                         <td>:</td>
                         <td>1 (satu) berkas</td>
