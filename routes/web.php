@@ -44,7 +44,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/kegiatans', [AdminKegiatanController::class, 'index'])->name('kegiatans.index');
             Route::get('/kegiatans/create', [AdminKegiatanController::class, 'create'])->name('kegiatans.create');
             Route::post('/kegiatans', [AdminKegiatanController::class, 'store'])->name('kegiatans.store');
+            Route::get('/kegiatans/export-pdf', [AdminKegiatanController::class, 'exportPdf'])->name('kegiatans.exportPdf');
             Route::get('/kegiatans/{kegiatan}', [AdminKegiatanController::class, 'show'])->name('kegiatans.show');
+            Route::get('/kegiatans/{kegiatan}/export-pdf', [AdminKegiatanController::class, 'exportPdfDetail'])->name('kegiatans.exportPdfDetail');
             Route::post('/kegiatans/{kegiatan}/notify', [AdminKegiatanController::class, 'notify'])->name('kegiatans.notify');
             Route::get('/kegiatans/{kegiatan}/edit', [AdminKegiatanController::class, 'edit'])->name('kegiatans.edit');
             Route::put('/kegiatans/{kegiatan}', [AdminKegiatanController::class, 'update'])->name('kegiatans.update');

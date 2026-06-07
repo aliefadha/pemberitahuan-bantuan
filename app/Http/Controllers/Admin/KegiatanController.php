@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
 use App\Models\User;
 use App\Notifications\KegiatanNotification;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class KegiatanController extends Controller
@@ -94,5 +96,31 @@ class KegiatanController extends Controller
         $kegiatan->delete();
 
         return redirect()->route('admin.kegiatans.index')->with('success', 'Kegiatan berhasil dihapus.');
+    }
+
+    public function exportPdf()
+    {
+        $kegiatans = Kegiatan::latest()->get();
+
+        Carbon::setLocale('id');
+
+        $pdf = Pdf::loadView('admin.kegiatans.pdf.all', compact('kegiatans'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('laporan-daftar-kegiatan-' . now()->format('Ymd-His') . '.pdf');
+    }
+
+    public function exportPdfDetail(Kegiatan $kegiatan)
+    {
+        $pesertas = $kegiatan->users()->orderBy('name')->get();
+
+        Carbon::setLocale('id');
+
+        $pdf = Pdf::loadView('admin.kegiatans.pdf.detail', compact('kegiatan', 'pesertas'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'laporan-kegiatan-' . str($kegiatan->judul)->slug() . '-' . now()->format('Ymd-His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }
