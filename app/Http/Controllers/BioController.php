@@ -8,6 +8,18 @@ use Illuminate\View\View;
 
 class BioController extends Controller
 {
+    public function show(): View
+    {
+        $sections = config('bio.sections');
+        $user = auth()->user();
+
+        return view('bio.show', [
+            'sections' => $sections,
+            'bioData' => $user->bio_data ?? [],
+            'user' => $user,
+        ]);
+    }
+
     public function edit(): View
     {
         $sections = config('bio.sections');

@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/bio', [App\Http\Controllers\BioController::class, 'edit'])->name('bio.edit')->withoutMiddleware('bio_filled');
     Route::patch('/bio', [App\Http\Controllers\BioController::class, 'update'])->name('bio.update')->withoutMiddleware('bio_filled');
+    Route::get('/bio/show', [App\Http\Controllers\BioController::class, 'show'])->name('bio.show');
 
     Route::middleware('bio_filled')->group(function () {
         Route::get('/anggota-keluarga/create', [App\Http\Controllers\AnggotaKeluargaController::class, 'create'])->name('anggota-keluarga.create');
