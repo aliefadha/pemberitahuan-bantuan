@@ -16,9 +16,21 @@
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800">{{ $user->name }}</h3>
                     <p class="text-sm text-gray-500 mt-0.5">{{ $user->email }}</p>
-                    @if($user->alamat || $user->jorong)
+                    @if($user->alamat || $user->jorong || $user->kelompok)
                         <p class="text-sm text-gray-500 mt-0.5">
-                            {{ collect([$user->jorong, $user->alamat])->filter()->implode(', ') }}
+                            @php
+                                $details = collect();
+                                if ($user->jorong_label) {
+                                    $details->push('Jorong: ' . $user->jorong_label);
+                                }
+                                if ($user->kelompok) {
+                                    $details->push('Kelompok: ' . $user->kelompok->name);
+                                }
+                                if ($user->alamat) {
+                                    $details->push('Alamat: ' . $user->alamat);
+                                }
+                            @endphp
+                            {{ $details->implode(' | ') }}
                         </p>
                     @endif
                 </div>

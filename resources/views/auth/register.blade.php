@@ -35,6 +35,74 @@
                 <p class="mt-1 text-xs text-gray-500">Contoh: 081234567890</p>
             </div>
 
+            {{-- Jorong --}}
+            <div>
+                <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong</label>
+                <select id="jorong" name="jorong"
+                    class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('jorong') border-red-500 @enderror">
+                    <option value="">-- Pilih Jorong --</option>
+                    <option value="padang_rantang" {{ old('jorong') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                    <option value="tanjung_pati"   {{ old('jorong') == 'tanjung_pati'   ? 'selected' : '' }}>Tanjung Pati</option>
+                    <option value="koto_tuo"       {{ old('jorong') == 'koto_tuo'       ? 'selected' : '' }}>Koto Tuo</option>
+                    <option value="pulutan"        {{ old('jorong') == 'pulutan'        ? 'selected' : '' }}>Pulutan</option>
+                </select>
+                @error('jorong')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- Kelompok (filtered by jorong via JS) --}}
+            <div>
+                <label for="kelompok_id" class="block text-sm font-medium text-gray-700 mb-1">Kelompok <span class="text-xs text-gray-400 font-normal">(opsional)</span></label>
+                <select id="kelompok_id" name="kelompok_id"
+                    class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('kelompok_id') border-red-500 @enderror">
+                    <option value="">-- Pilih Kelompok --</option>
+                    @foreach($kelompoks as $k)
+                        <option
+                            value="{{ $k->id }}"
+                            data-jorong="{{ $k->jorong ?? '' }}"
+                            {{ old('kelompok_id') == $k->id ? 'selected' : '' }}
+                        >{{ $k->name }}</option>
+                    @endforeach
+                </select>
+                @error('kelompok_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-xs text-gray-400" id="kelompok-hint" style="display:none">Pilih jorong terlebih dahulu untuk melihat kelompok yang tersedia.</p>
+            </div>
+
+            <script>
+            (function () {
+                var jorongSel   = document.getElementById('jorong');
+                var kelompokSel = document.getElementById('kelompok_id');
+                var hint        = document.getElementById('kelompok-hint');
+                var allOptions  = Array.from(kelompokSel.options).slice(1); // skip placeholder
+
+                function filterKelompok() {
+                    var jorong = jorongSel.value;
+
+                    allOptions.forEach(function (opt) {
+                        var match = !jorong || opt.dataset.jorong === jorong;
+                        opt.hidden   = !match;
+                        opt.disabled = !match;
+                    });
+
+                    // Reset selection if current value is now hidden
+                    var current = kelompokSel.options[kelompokSel.selectedIndex];
+                    if (current && current.hidden) {
+                        kelompokSel.value = '';
+                    }
+
+                    hint.style.display = jorong ? 'none' : 'block';
+                }
+
+                jorongSel.addEventListener('change', filterKelompok);
+
+                // Run on page load to restore filtered state (e.g. after validation failure)
+                filterKelompok();
+            })();
+            </script>
+
             @if(auth()->check() && auth()->user()->isAdmin())
             <div>
                 <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
@@ -80,6 +148,8 @@
                 </div>
             </div>
         </div>
+
+        @include('partials.anggota-keluarga-form')
 
         <div class="mt-6">
             <button type="submit" class="w-full px-4 py-1.5 px-2 font-medium rounded-lg bg-black text-white">

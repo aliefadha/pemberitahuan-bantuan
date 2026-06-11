@@ -9,6 +9,7 @@ use App\Notifications\KegiatanNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KegiatanController extends Controller
 {
@@ -30,18 +31,25 @@ class KegiatanController extends Controller
             'judul' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string'],
             'tanggal' => ['required', 'date'],
+            'jorong' => ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'],
         ]);
 
         $kegiatan = Kegiatan::create([
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
+            'jorong' => $request->jorong,
         ]);
 
-        $usersToNotify = User::where('id', '!=', auth()->id())
+        $query = User::where('id', '!=', auth()->id())
             ->whereNotNull('bio_data')
-            ->where('bio_data', '!=', '[]')
-            ->get();
+            ->where('bio_data', '!=', '[]');
+
+        if ($kegiatan->jorong) {
+            $query->where('jorong', $kegiatan->jorong);
+        }
+
+        $usersToNotify = $query->get();
         foreach ($usersToNotify as $user) {
             $user->notify(new KegiatanNotification($kegiatan, 'created'));
         }
@@ -51,17 +59,34 @@ class KegiatanController extends Controller
 
     public function show(Kegiatan $kegiatan)
     {
-        $pesertas = $kegiatan->users()->orderBy('name')->get();
+        // Get all users in the activity's jorong (excluding admin)
+        $pesertas = User::where('jorong', $kegiatan->jorong)
+            ->where('role', '!=', 'admin')
+            ->with('kelompok')
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.kegiatans.show', compact('kegiatan', 'pesertas'));
+        // Get response statuses mapped by user_id
+        $responses = DB::table('kegiatan_user')
+            ->where('kegiatan_id', $kegiatan->id)
+            ->get(['user_id', 'status', 'updated_at'])
+            ->keyBy('user_id')
+            ->toArray();
+
+        return view('admin.kegiatans.show', compact('kegiatan', 'pesertas', 'responses'));
     }
 
     public function notify(Kegiatan $kegiatan)
     {
-        $usersToNotify = User::where('id', '!=', auth()->id())
+        $query = User::where('id', '!=', auth()->id())
             ->whereNotNull('bio_data')
-            ->where('bio_data', '!=', '[]')
-            ->get();
+            ->where('bio_data', '!=', '[]');
+
+        if ($kegiatan->jorong) {
+            $query->where('jorong', $kegiatan->jorong);
+        }
+
+        $usersToNotify = $query->get();
         foreach ($usersToNotify as $user) {
             $user->notify(new KegiatanNotification($kegiatan, 'created'));
         }
@@ -80,12 +105,14 @@ class KegiatanController extends Controller
             'judul' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string'],
             'tanggal' => ['required', 'date'],
+            'jorong' => ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'],
         ]);
 
         $kegiatan->update([
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
+            'jorong' => $request->jorong,
         ]);
 
         return redirect()->route('admin.kegiatans.index')->with('success', 'Kegiatan berhasil diupdate.');
@@ -112,11 +139,23 @@ class KegiatanController extends Controller
 
     public function exportPdfDetail(Kegiatan $kegiatan)
     {
-        $pesertas = $kegiatan->users()->orderBy('name')->get();
+        // Get all users in the activity's jorong (excluding admin)
+        $pesertas = User::where('jorong', $kegiatan->jorong)
+            ->where('role', '!=', 'admin')
+            ->with('kelompok')
+            ->orderBy('name')
+            ->get();
+
+        // Get response statuses mapped by user_id
+        $responses = DB::table('kegiatan_user')
+            ->where('kegiatan_id', $kegiatan->id)
+            ->get(['user_id', 'status', 'updated_at'])
+            ->keyBy('user_id')
+            ->toArray();
 
         Carbon::setLocale('id');
 
-        $pdf = Pdf::loadView('admin.kegiatans.pdf.detail', compact('kegiatan', 'pesertas'))
+        $pdf = Pdf::loadView('admin.kegiatans.pdf.detail', compact('kegiatan', 'pesertas', 'responses'))
             ->setPaper('a4', 'portrait');
 
         $filename = 'laporan-kegiatan-' . str($kegiatan->judul)->slug() . '-' . now()->format('Ymd-His') . '.pdf';

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'password',
         'role',
         'bio_data',
+        'kelompok_id',
     ];
 
     /**
@@ -50,6 +52,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'bio_data' => 'array',
         ];
     }
 
@@ -68,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(AnggotaKeluarga::class);
     }
 
+    public function kelompok(): BelongsTo
+    {
+        return $this->belongsTo(Kelompok::class);
+    }
+
     public function kegiatans()
     {
         return $this->belongsToMany(Kegiatan::class)->withPivot('status')->withTimestamps();
@@ -84,5 +92,16 @@ class User extends Authenticatable
         }
 
         return $phone;
+    }
+
+    public function getJorongLabelAttribute(): ?string
+    {
+        return match ($this->jorong) {
+            'padang_rantang' => 'Padang Rantang',
+            'tanjung_pati' => 'Tanjung Pati',
+            'koto_tuo' => 'Koto Tuo',
+            'pulutan' => 'Pulutan',
+            default => $this->jorong,
+        };
     }
 }

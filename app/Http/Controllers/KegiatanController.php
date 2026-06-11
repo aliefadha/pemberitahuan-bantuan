@@ -3,13 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
+use App\Models\Kelompok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KegiatanController extends Controller
 {
     public function index()
     {
-        $kegiatans = Kegiatan::latest()->paginate(10);
+        $query = Kegiatan::query();
+
+        if (auth()->check() && !auth()->user()->isAdmin()) {
+            $userJorong = auth()->user()->jorong;
+            $query->where('jorong', $userJorong);
+        }
+
+        $kegiatans = $query->latest()->paginate(10);
 
         return view('kegiatan.index', compact('kegiatans'));
     }
@@ -19,7 +28,20 @@ class KegiatanController extends Controller
         $userResponse = $kegiatan->users()->where('user_id', auth()->id())->first();
         $status = $userResponse ? $userResponse->pivot->status : null;
 
-        return view('kegiatan.show', compact('kegiatan', 'status'));
+        $userJorong = auth()->user()->jorong;
+        $kelompoks = Kelompok::where('jorong', $userJorong)
+            ->with(['users' => function ($query) {
+                $query->orderBy('name');
+            }])
+            ->orderBy('name')
+            ->get();
+
+        $responses = DB::table('kegiatan_user')
+            ->where('kegiatan_id', $kegiatan->id)
+            ->pluck('status', 'user_id')
+            ->toArray();
+
+        return view('kegiatan.show', compact('kegiatan', 'status', 'kelompoks', 'responses'));
     }
 
     public function respond(Request $request, Kegiatan $kegiatan)

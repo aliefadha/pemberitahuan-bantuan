@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
+use App\Http\Controllers\Admin\KelompokController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
@@ -41,6 +42,15 @@ Route::middleware('auth')->group(function () {
             Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
             Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+            Route::get('/kelompoks', [KelompokController::class, 'index'])->name('kelompoks.index');
+            Route::get('/kelompoks/create', [KelompokController::class, 'create'])->name('kelompoks.create');
+            Route::post('/kelompoks', [KelompokController::class, 'store'])->name('kelompoks.store');
+            Route::get('/kelompoks/export-pdf', [KelompokController::class, 'exportPdf'])->name('kelompoks.exportPdf');
+            Route::get('/kelompoks/{kelompok}/export-pdf', [KelompokController::class, 'exportPdfDetail'])->name('kelompoks.exportPdfDetail');
+            Route::get('/kelompoks/{kelompok}/edit', [KelompokController::class, 'edit'])->name('kelompoks.edit');
+            Route::put('/kelompoks/{kelompok}', [KelompokController::class, 'update'])->name('kelompoks.update');
+            Route::delete('/kelompoks/{kelompok}', [KelompokController::class, 'destroy'])->name('kelompoks.destroy');
 
             Route::get('/kegiatans', [AdminKegiatanController::class, 'index'])->name('kegiatans.index');
             Route::get('/kegiatans/create', [AdminKegiatanController::class, 'create'])->name('kegiatans.create');

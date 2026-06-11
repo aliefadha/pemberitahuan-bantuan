@@ -9,7 +9,7 @@ return [
                     'key' => 'jumlah_anggota_keluarga',
                     'question' => 'Jumlah anggota keluarga',
                     'type' => 'integer',
-                    'min' => 1,
+                    'min' => 0,
                 ],
                 [
                     'key' => 'jumlah_balita',

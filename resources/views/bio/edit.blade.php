@@ -50,8 +50,8 @@
                                                     name="bio_data[{{ $q['key'] }}]"
                                                     class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error("bio_data.{$q['key']}") border-red-500 @enderror">
                                                     <option value="">Pilih</option>
-                                                    <option value="1" {{ old('bio_data.' . $q['key'], $bioData[$q['key']] ?? '') == '1' ? 'selected' : '' }}>Ya</option>
-                                                    <option value="0" {{ old('bio_data.' . $q['key'], $bioData[$q['key']] ?? '') == '0' ? 'selected' : '' }}>Tidak</option>
+                                                    <option value="1" {{ (string)old('bio_data.' . $q['key'], $bioData[$q['key']] ?? '0') === '1' ? 'selected' : '' }}>Ya</option>
+                                                    <option value="0" {{ (string)old('bio_data.' . $q['key'], $bioData[$q['key']] ?? '0') === '0' ? 'selected' : '' }}>Tidak</option>
                                                 </select>
                                             @endif
 
@@ -79,9 +79,9 @@
                         </div>
 
                         <div>
-                            <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong</label>
-                            <select id="jorong" name="jorong"
-                                class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('jorong') border-red-500 @enderror">
+                            <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong <span class="text-red-500">*</span></label>
+                            <select id="jorong" name="jorong" required
+                                class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('jorong') border-red-500 @enderror">
                                 <option value="">Pilih Jorong</option>
                                 <option value="padang_rantang" {{ old('jorong', $user->jorong ?? '') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
                                 <option value="pulutan" {{ old('jorong', $user->jorong ?? '') == 'pulutan' ? 'selected' : '' }}>Pulutan</option>
@@ -92,24 +92,61 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <div>
+                            <label for="kelompok_id" class="block text-sm font-medium text-gray-700 mb-1">Kelompok <span class="text-red-500">*</span></label>
+                            <select id="kelompok_id" name="kelompok_id" required
+                                class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('kelompok_id') border-red-500 @enderror">
+                                <option value="">-- Pilih Kelompok --</option>
+                                @foreach($kelompoks as $k)
+                                    <option
+                                        value="{{ $k->id }}"
+                                        data-jorong="{{ $k->jorong ?? '' }}"
+                                        {{ old('kelompok_id', $user->kelompok_id ?? '') == $k->id ? 'selected' : '' }}
+                                    >{{ $k->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('kelompok_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="mt-1 text-xs text-gray-400" id="kelompok-hint" style="display:none">Pilih jorong terlebih dahulu untuk melihat kelompok yang tersedia.</p>
+                        </div>
                     </div>
 
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-base font-semibold text-gray-800">Anggota Keluarga</h4>
-                            <button type="button" id="addAnggotaKeluarga"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Tambah Anggota Keluarga
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-4">Klik tombol di atas untuk menambahkan anggota keluarga (maksimal 20)</p>
+                    <script>
+                    (function () {
+                        var jorongSel   = document.getElementById('jorong');
+                        var kelompokSel = document.getElementById('kelompok_id');
+                        var hint        = document.getElementById('kelompok-hint');
+                        var allOptions  = Array.from(kelompokSel.options).slice(1); // skip placeholder
 
-                        <div id="anggotaKeluargaContainer" class="space-y-3">
-                        </div>
-                    </div>
+                        function filterKelompok() {
+                            var jorong = jorongSel.value;
+
+                            allOptions.forEach(function (opt) {
+                                var match = !jorong || opt.dataset.jorong === jorong;
+                                opt.hidden   = !match;
+                                opt.disabled = !match;
+                            });
+
+                            // Reset selection if current value is now hidden
+                            var current = kelompokSel.options[kelompokSel.selectedIndex];
+                            if (current && current.hidden) {
+                                kelompokSel.value = '';
+                            }
+
+                            hint.style.display = jorong ? 'none' : 'block';
+                        }
+
+                        if (jorongSel && kelompokSel) {
+                            jorongSel.addEventListener('change', filterKelompok);
+                            // Run initially
+                            filterKelompok();
+                        }
+                    })();
+                    </script>
+
+                    @include('partials.anggota-keluarga-form')
 
                     <div class="mt-8 pt-6 border-t border-gray-200">
                         <button type="submit" class="w-full px-4 py-2 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition">

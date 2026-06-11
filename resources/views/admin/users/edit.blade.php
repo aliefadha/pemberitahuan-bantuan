@@ -56,6 +56,21 @@
                         @enderror
                     </div>
 
+                    <div>
+                        <label for="kelompok_id" class="block text-sm font-medium text-gray-700 mb-1">Kelompok</label>
+                        <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('kelompok_id') border-red-500 @enderror" id="kelompok_id" name="kelompok_id">
+                            <option value="">-- Tidak ada --</option>
+                            @foreach($kelompoks as $k)
+                                <option value="{{ $k->id }}" {{ old('kelompok_id', $user->kelompok_id) == $k->id ? 'selected' : '' }}>
+                                    {{ $k->name }}{{ $k->jorong ? ' — ' . $k->jorong_label : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('kelompok_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p class="text-sm text-blue-800 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,8 +123,8 @@
                                                         name="bio_data[{{ $q['key'] }}]"
                                                         class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500">
                                                         <option value="">Pilih</option>
-                                                        <option value="1" {{ old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') == '1' ? 'selected' : '' }}>Ya</option>
-                                                        <option value="0" {{ old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') == '0' ? 'selected' : '' }}>Tidak</option>
+                                                        <option value="1" {{ (string)old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') === '1' ? 'selected' : '' }}>Ya</option>
+                                                        <option value="0" {{ (string)old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') === '0' ? 'selected' : '' }}>Tidak</option>
                                                     </select>
                                                 @endif
                                             </div>
@@ -120,6 +135,149 @@
                         </div>
                     </div>
                     @endif
+
+                    {{-- Anggota Keluarga Section --}}
+                    <div class="border-t border-gray-200 pt-6 mt-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-base font-semibold text-gray-800">Anggota Keluarga</h4>
+                            <button type="button" id="btn-add-anggota-edit"
+                                class="inline-flex items-center gap-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg px-3 py-1.5 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Tambah Anggota
+                            </button>
+                        </div>
+
+                        <div id="anggota-list-edit" class="space-y-4"></div>
+                        <p class="mt-2 text-xs text-gray-400 italic" id="anggota-empty-hint-edit" style="display:none">Belum ada anggota keluarga.</p>
+                    </div>
+
+                    {{-- Row Template --}}
+                    <template id="anggota-row-tpl">
+                        <div class="anggota-row border border-gray-200 rounded-xl p-4 bg-gray-50 relative">
+                            <button type="button" class="btn-remove-anggota absolute top-3 right-3 text-gray-400 hover:text-red-500 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                                    <input type="text" name="anggota_keluarga[__I__][nama]"
+                                        class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm" placeholder="Nama anggota" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Status dalam Keluarga <span class="text-red-500">*</span></label>
+                                    <select name="anggota_keluarga[__I__][status_dalam_keluarga]" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm" required>
+                                        <option value="" disabled selected>-- Pilih --</option>
+                                        <option value="suami">Suami</option>
+                                        <option value="istri">Istri</option>
+                                        <option value="anak">Anak</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
+                                    <select name="anggota_keluarga[__I__][jenis_kelamin]" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm" required>
+                                        <option value="" disabled selected>-- Pilih --</option>
+                                        <option value="laki_laki">Laki-laki</option>
+                                        <option value="perempuan">Perempuan</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Status Perkawinan <span class="text-red-500">*</span></label>
+                                    <select name="anggota_keluarga[__I__][status_perkawinan]" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm" required>
+                                        <option value="" disabled selected>-- Pilih --</option>
+                                        <option value="menikah">Menikah</option>
+                                        <option value="belum_menikah">Belum Menikah</option>
+                                        <option value="cerai">Cerai</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Tanggal Lahir</label>
+                                    <input type="date" name="anggota_keluarga[__I__][tanggal_lahir]"
+                                        class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Pekerjaan</label>
+                                    <input type="text" name="anggota_keluarga[__I__][pekerjaan]"
+                                        class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm" placeholder="Opsional">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Status Khusus</label>
+                                    <select name="anggota_keluarga[__I__][status]" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 text-sm">
+                                        <option value="">-- Tidak ada --</option>
+                                        <option value="meninggal">Meninggal</option>
+                                        <option value="hamil">Hamil</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <script>
+                    (function () {
+                        var idx  = 0;
+                        var list = document.getElementById('anggota-list-edit');
+                        var hint = document.getElementById('anggota-empty-hint-edit');
+                        var tpl  = document.getElementById('anggota-row-tpl');
+
+                        function updateHint() {
+                            hint.style.display = list.children.length === 0 ? 'block' : 'none';
+                        }
+
+                        function addRow(data) {
+                            var clone = tpl.content.cloneNode(true);
+                            var row   = clone.querySelector('.anggota-row');
+                            var i     = idx++;
+
+                            row.querySelectorAll('[name]').forEach(function (el) {
+                                el.name = el.name.replace(/__I__/g, i);
+                            });
+
+                            if (data) {
+                                var fields = ['nama','status_dalam_keluarga','jenis_kelamin','status_perkawinan','tanggal_lahir','pekerjaan','status'];
+                                fields.forEach(function (f) {
+                                    var el = row.querySelector('[name="anggota_keluarga[' + i + '][' + f + ']"]');
+                                    if (el && data[f] != null) el.value = data[f];
+                                });
+                            }
+
+                            row.querySelector('.btn-remove-anggota').addEventListener('click', function () {
+                                row.remove();
+                                updateHint();
+                            });
+
+                            list.appendChild(row);
+                            updateHint();
+                        }
+
+                        document.getElementById('btn-add-anggota-edit').addEventListener('click', function () {
+                            addRow(null);
+                        });
+
+                        // Seed: prefer old() on validation failure, else existing DB records
+                        @if(old('anggota_keluarga'))
+                            @json(old('anggota_keluarga')).forEach(function (d) { addRow(d); });
+                        @else
+                            @php
+                                $existingAnggota = $user->anggotaKeluarga->map(fn($a) => [
+                                    'nama'                  => $a->nama,
+                                    'status_dalam_keluarga' => $a->status_dalam_keluarga,
+                                    'jenis_kelamin'         => $a->jenis_kelamin,
+                                    'status_perkawinan'     => $a->status_perkawinan,
+                                    'tanggal_lahir'         => $a->tanggal_lahir?->format('Y-m-d'),
+                                    'pekerjaan'             => $a->pekerjaan,
+                                    'status'                => $a->status,
+                                ])->values()->all();
+                            @endphp
+                            var existing = @json($existingAnggota);
+                            existing.forEach(function (d) { addRow(d); });
+                        @endif
+
+                        updateHint();
+                    })();
+                    </script>
 
                     <div class="pt-4 flex items-center gap-3">
                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">

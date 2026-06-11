@@ -24,17 +24,32 @@ class BioController extends Controller
     {
         $sections = config('bio.sections');
         $user = auth()->user();
+        $kelompoks = \App\Models\Kelompok::orderBy('jorong')->orderBy('name')->get();
 
         return view('bio.edit', [
             'sections' => $sections,
             'bioData' => $user->bio_data ?? [],
+            'user' => $user,
+            'kelompoks' => $kelompoks,
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
         $sections = config('bio.sections');
-        $rules = [];
+        $rules = [
+            'alamat'                                    => ['nullable', 'string', 'max:500'],
+            'jorong'                                    => ['required', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'],
+            'kelompok_id'                               => ['required', 'exists:kelompoks,id'],
+            'anggota_keluarga'                          => ['nullable', 'array'],
+            'anggota_keluarga.*.nama'                   => ['required', 'string', 'max:255'],
+            'anggota_keluarga.*.status_dalam_keluarga'  => ['required', 'in:suami,istri,anak'],
+            'anggota_keluarga.*.status_perkawinan'      => ['required', 'in:menikah,belum_menikah,cerai'],
+            'anggota_keluarga.*.jenis_kelamin'          => ['required', 'in:laki_laki,perempuan'],
+            'anggota_keluarga.*.tanggal_lahir'          => ['nullable', 'date'],
+            'anggota_keluarga.*.pekerjaan'              => ['nullable', 'string', 'max:255'],
+            'anggota_keluarga.*.status'                 => ['nullable', 'in:meninggal,hamil'],
+        ];
 
         foreach ($sections as $section) {
             foreach ($section['questions'] as $q) {
@@ -56,8 +71,30 @@ class BioController extends Controller
         $validated = $request->validate($rules);
 
         $user = $request->user();
-        $user->bio_data = $validated['bio_data'] ?? [];
-        $user->save();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $validated, $request) {
+            $newJorong = $validated['jorong'] ?? null;
+            $kelompokId = $validated['kelompok_id'] ?? null;
+
+            if ($kelompokId) {
+                $kelompok = \App\Models\Kelompok::find($kelompokId);
+                if (!$kelompok || $kelompok->jorong !== $newJorong) {
+                    $kelompokId = null;
+                }
+            }
+
+            $user->alamat = $validated['alamat'] ?? null;
+            $user->jorong = $newJorong;
+            $user->kelompok_id = $kelompokId;
+            $user->bio_data = $validated['bio_data'] ?? [];
+            $user->save();
+
+            // Sync family members
+            $user->anggotaKeluarga()->delete();
+            foreach ($request->input('anggota_keluarga', []) as $anggota) {
+                $user->anggotaKeluarga()->create($anggota);
+            }
+        });
 
         return redirect()->route('bio.edit')->with('success', 'Bio berhasil disimpan.');
     }

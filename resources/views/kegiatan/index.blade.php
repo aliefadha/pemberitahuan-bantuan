@@ -20,6 +20,7 @@
                         <th class="px-6 py-3">Judul</th>
                         <th class="px-6 py-3">Deskripsi</th>
                         <th class="px-6 py-3">Tanggal</th>
+                        <th class="px-6 py-3">Jorong</th>
                         <th class="px-6 py-3">Aksi</th>
                     </tr>
                 </thead>
@@ -30,6 +31,15 @@
                         <td class="px-6 py-4 font-medium text-gray-900">{{ $kegiatan->judul }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ Str::limit($kegiatan->deskripsi, 100) }}</td>
                         <td class="px-6 py-4 text-gray-900">{{ $kegiatan->tanggal->format('d/m/Y H:i') }}</td>
+                        <td class="px-6 py-4">
+                            @if($kegiatan->jorong)
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                                    {{ $kegiatan->jorong_label }}
+                                </span>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4">
                             <a href="{{ route('kegiatan.show', $kegiatan) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +52,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
                             Belum ada kegiatan pada sistem.
                         </td>
                     </tr>

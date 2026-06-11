@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Daftar Kegiatan</title>
+    <title>Laporan Daftar Kelompok</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -16,7 +16,7 @@
 
         /* ==============================
            KOP SURAT
-        ============================== */
+           ============================== */
         .kop-surat {
             padding: 18px 48px 0 48px;
         }
@@ -48,7 +48,7 @@
 
         /* ==============================
            DOCUMENT BODY
-        ============================== */
+           ============================== */
         .doc-body {
             padding: 16px 48px 40px 48px;
         }
@@ -175,12 +175,15 @@
             width: 30px;
         }
 
-        .td-tanggal {
-            white-space: nowrap;
+        .td-jumlah {
             text-align: center;
+            width: 120px;
         }
 
-
+        .td-jorong {
+            text-align: center;
+            width: 150px;
+        }
 
         /* Footer note */
         .footer-note {
@@ -216,7 +219,7 @@
                     <tr>
                         <td>Nomor</td>
                         <td>:</td>
-                        <td>{{ now()->format('Y') }}/KEG/{{ str_pad(1, 3, '0', STR_PAD_LEFT) }}/{{ now()->format('m/Y') }}</td>
+                        <td>{{ now()->format('Y') }}/KLMPK/{{ str_pad(1, 3, '0', STR_PAD_LEFT) }}/{{ now()->format('m/Y') }}</td>
                     </tr>
                     <tr>
                         <td>Lampiran</td>
@@ -226,7 +229,7 @@
                     <tr>
                         <td>Hal</td>
                         <td>:</td>
-                        <td><strong>Laporan Daftar Kegiatan</strong></td>
+                        <td><strong>Laporan Daftar Kelompok</strong></td>
                     </tr>
                 </table>
             </div>
@@ -237,7 +240,7 @@
 
         {{-- Judul Dokumen --}}
         <div class="doc-title-block">
-            <h2>Laporan Daftar Kegiatan</h2>
+            <h2>Laporan Daftar Kelompok</h2>
         </div>
 
         {{-- Ringkasan --}}
@@ -248,46 +251,38 @@
                     <td>: {{ now()->translatedFormat('d F Y, H:i') }} WIB</td>
                 </tr>
                 <tr>
-                    <td class="label">Total Kegiatan</td>
-                    <td>: <strong>{{ $kegiatans->count() }} Kegiatan</strong></td>
-                </tr>
-                @if($kegiatans->isNotEmpty())
-                <tr>
-                    <td class="label">Kegiatan Terbaru</td>
-                    <td>: {{ $kegiatans->first()->tanggal->translatedFormat('d F Y') }}</td>
+                    <td class="label">Total Kelompok</td>
+                    <td>: <strong>{{ $kelompoks->count() }} Kelompok</strong></td>
                 </tr>
                 <tr>
-                    <td class="label">Kegiatan Terlama</td>
-                    <td>: {{ $kegiatans->last()->tanggal->translatedFormat('d F Y') }}</td>
+                    <td class="label">Total Anggota Terdaftar</td>
+                    <td>: <strong>{{ $kelompoks->sum('users_count') }} Orang</strong></td>
                 </tr>
-                @endif
             </table>
         </div>
 
-        {{-- Tabel Kegiatan --}}
+        {{-- Tabel Kelompok --}}
         <table class="main-table">
             <thead>
                 <tr>
                     <th style="width:32px;">No.</th>
-                    <th>Judul Kegiatan</th>
-                    <th>Deskripsi</th>
-                    <th style="width:110px;">Tanggal Pelaksanaan</th>
-                    <th style="width:90px;">Jorong</th>
+                    <th>Nama Kelompok</th>
+                    <th class="td-jorong">Jorong</th>
+                    <th class="td-jumlah">Jumlah Anggota</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($kegiatans as $i => $kegiatan)
+                @forelse($kelompoks as $i => $kelompok)
                 <tr>
                     <td class="td-no">{{ $i + 1 }}.</td>
-                    <td><strong>{{ $kegiatan->judul }}</strong></td>
-                    <td>{{ $kegiatan->deskripsi ? Str::limit($kegiatan->deskripsi, 100) : '-' }}</td>
-                    <td class="td-tanggal">{{ $kegiatan->tanggal->format('d/m/Y') }}<br><small>{{ $kegiatan->tanggal->format('H:i') }} WIB</small></td>
-                    <td style="text-align: center; font-size: 8.5pt;">{{ $kegiatan->jorong_label ?? '-' }}</td>
+                    <td><strong>{{ $kelompok->name }}</strong></td>
+                    <td style="text-align: center;">{{ $kelompok->jorong_label }}</td>
+                    <td style="text-align: center;">{{ $kelompok->users_count }} Orang</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" style="text-align:center; padding:20px; color:#555; font-style:italic;">
-                        Belum ada data kegiatan.
+                    <td colspan="4" style="text-align:center; padding:20px; color:#555; font-style:italic;">
+                        Belum ada data kelompok.
                     </td>
                 </tr>
                 @endforelse

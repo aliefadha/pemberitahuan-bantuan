@@ -265,8 +265,9 @@
         {{-- Nomor, Sifat, Lampiran, Hal --}}
         @php
             $totalPeserta   = $pesertas->count();
-            $bersedia       = $pesertas->where('pivot.status', 'bersedia')->count();
-            $tidakBersedia  = $totalPeserta - $bersedia;
+            $bersedia       = collect($responses)->where('status', 'bersedia')->count();
+            $tidakBersedia  = collect($responses)->where('status', 'tidak_bersedia')->count();
+            $belumMerespons = $totalPeserta - $bersedia - $tidakBersedia;
         @endphp
 
         <div class="doc-header-row">
@@ -315,6 +316,11 @@
                         <td>{{ $kegiatan->tanggal->translatedFormat('l, d F Y') }}, Pukul {{ $kegiatan->tanggal->format('H:i') }} WIB</td>
                     </tr>
                     <tr>
+                        <td>Jorong</td>
+                        <td>:</td>
+                        <td>{{ $kegiatan->jorong_label ?? '-' }}</td>
+                    </tr>
+                    <tr>
                         <td>Deskripsi</td>
                         <td>:</td>
                         <td>{{ $kegiatan->deskripsi ?: '-' }}</td>
@@ -340,41 +346,61 @@
             </tr>
         </table>
 
-        {{-- Tabel Peserta --}}
-        <table class="main-table">
-            <thead>
-                <tr>
-                    <th style="width:32px;">No.</th>
-                    <th>Nama Lengkap</th>
-                    <th>Nomor WhatsApp</th>
-                    <th style="width:100px;">Status Kehadiran</th>
-                    <th style="width:110px;">Waktu Tanggapan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($pesertas as $i => $peserta)
-                <tr>
-                    <td class="td-no">{{ $i + 1 }}.</td>
-                    <td><strong>{{ $peserta->name }}</strong></td>
-                    <td>{{ $peserta->no_telepon ?? '-' }}</td>
-                    <td class="td-status">
-                        @if($peserta->pivot->status === 'bersedia')
-                            <span class="status-bersedia">&#10003; Bersedia</span>
-                        @else
-                            <span class="status-tidak">&#10007; Tidak Bersedia</span>
-                        @endif
-                    </td>
-                    <td class="td-waktu">{{ $peserta->pivot->updated_at->format('d/m/Y') }}<br>{{ $peserta->pivot->updated_at->format('H:i') }} WIB</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" style="text-align:center; padding:20px; color:#555; font-style:italic;">
-                        Belum ada peserta yang memberikan tanggapan.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+        @php
+            $groupedPesertas = $pesertas->groupBy(function($user) {
+                return $user->kelompok ? $user->kelompok->name : 'Tanpa Kelompok';
+            })->sortBy(function($group, $key) {
+                return $key === 'Tanpa Kelompok' ? 'zzzzzzz' : $key;
+            });
+        @endphp
+
+        {{-- Grouped Tables --}}
+        @forelse($groupedPesertas as $kelompokName => $members)
+            <div style="margin-top: 20px; page-break-inside: avoid;">
+                <div style="font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 10.5pt; font-weight: bold; margin-bottom: 6px; border-bottom: 1.5px solid #000; padding-bottom: 3px; color: #000;">
+                    {{ $kelompokName }} ({{ $members->count() }} orang)
+                </div>
+                <table class="main-table" style="margin-top: 0px; margin-bottom: 15px;">
+                    <thead>
+                        <tr>
+                            <th style="width:32px;">No.</th>
+                            <th>Nama Lengkap</th>
+                            <th>Nomor WhatsApp</th>
+                            <th style="width:100px;">Status Kehadiran</th>
+                            <th style="width:110px;">Waktu Tanggapan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($members as $j => $peserta)
+                        @php
+                            $response = $responses[$peserta->id] ?? null;
+                            $status = $response ? $response->status : 'belum_menanggapi';
+                            $updatedAt = $response ? \Carbon\Carbon::parse($response->updated_at) : null;
+                        @endphp
+                        <tr>
+                            <td class="td-no">{{ $j + 1 }}.</td>
+                            <td><strong>{{ $peserta->name }}</strong></td>
+                            <td>{{ $peserta->no_telepon ?? '-' }}</td>
+                            <td class="td-status">
+                                @if($status === 'bersedia')
+                                    <span class="status-bersedia">&#10003; Bersedia</span>
+                                @elseif($status === 'tidak_bersedia')
+                                    <span class="status-tidak">&#10007; Tidak Bersedia</span>
+                                @else
+                                    <span style="color: #666; font-style: italic;">Belum Merespons</span>
+                                @endif
+                            </td>
+                            <td class="td-waktu">{{ $updatedAt ? $updatedAt->translatedFormat('d/m/Y') . ' ' . $updatedAt->format('H:i') . ' WIB' : '-' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @empty
+            <div style="text-align:center; padding:20px; color:#555; font-style:italic; border: 1px dashed #999; margin-top: 20px;">
+                Tidak ada data peserta di jorong ini.
+            </div>
+        @endforelse
     </div>
 
 </body>

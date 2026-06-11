@@ -16,6 +16,7 @@ class AnggotaKeluarga extends Model
         'jenis_kelamin',
         'tanggal_lahir',
         'pekerjaan',
+        'status',
     ];
 
     protected function casts(): array
@@ -53,6 +54,14 @@ class AnggotaKeluarga extends Model
         return [
             'laki_laki' => 'Laki-laki',
             'perempuan' => 'Perempuan',
+        ];
+    }
+
+    public static function statusKhususOptions(): array
+    {
+        return [
+            'meninggal' => 'Meninggal',
+            'hamil'     => 'Hamil',
         ];
     }
 }
