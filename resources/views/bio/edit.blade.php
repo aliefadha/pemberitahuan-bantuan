@@ -40,11 +40,11 @@
                                                 <input type="number"
                                                     id="bio_data_{{ $q['key'] }}"
                                                     name="bio_data[{{ $q['key'] }}]"
-                                                    value="{{ old('bio_data.' . $q['key'], $bioData[$q['key']] ?? '') }}"
+                                                    value="{{ old('bio_data.' . $q['key'], $bioData[$q['key']] ?? 0) }}"
                                                     @isset($q['min']) min="{{ $q['min'] }}" @endisset
                                                     @isset($q['max']) max="{{ $q['max'] }}" @endisset
                                                     class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error("bio_data.{$q['key']}") border-red-500 @enderror"
-                                                    placeholder="0">
+                                                    >
                                             @elseif($q['type'] === 'boolean')
                                                 <select id="bio_data_{{ $q['key'] }}"
                                                     name="bio_data[{{ $q['key'] }}]"
@@ -63,6 +63,52 @@
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200 space-y-6">
+                        <h4 class="text-base font-semibold text-gray-800">Informasi Tempat Tinggal</h4>
+
+                        <div>
+                            <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                            <input type="text" id="alamat" name="alamat" value="{{ old('alamat', $user->alamat ?? '') }}" autocomplete="street-address"
+                                class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('alamat') border-red-500 @enderror"
+                                placeholder="Masukkan alamat lengkap">
+                            @error('alamat')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong</label>
+                            <select id="jorong" name="jorong"
+                                class="w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-2 focus:border-purple-500 focus:ring-purple-500 @error('jorong') border-red-500 @enderror">
+                                <option value="">Pilih Jorong</option>
+                                <option value="padang_rantang" {{ old('jorong', $user->jorong ?? '') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                                <option value="pulutan" {{ old('jorong', $user->jorong ?? '') == 'pulutan' ? 'selected' : '' }}>Pulutan</option>
+                                <option value="koto_tuo" {{ old('jorong', $user->jorong ?? '') == 'koto_tuo' ? 'selected' : '' }}>Koto Tuo</option>
+                                <option value="tanjung_pati" {{ old('jorong', $user->jorong ?? '') == 'tanjung_pati' ? 'selected' : '' }}>Tanjung Pati</option>
+                            </select>
+                            @error('jorong')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-base font-semibold text-gray-800">Anggota Keluarga</h4>
+                            <button type="button" id="addAnggotaKeluarga"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Tambah Anggota Keluarga
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Klik tombol di atas untuk menambahkan anggota keluarga (maksimal 20)</p>
+
+                        <div id="anggotaKeluargaContainer" class="space-y-3">
+                        </div>
                     </div>
 
                     <div class="mt-8 pt-6 border-t border-gray-200">
