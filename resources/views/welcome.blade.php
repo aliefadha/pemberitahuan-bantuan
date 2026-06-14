@@ -44,7 +44,7 @@
                     <span class="block text-xs font-semibold text-amber-600/80 tracking-wider uppercase -mt-1">Padang Rantang</span>
                 </div>
             </div>
-            
+
             <div>
                 @if (Route::has('login'))
                     @auth
@@ -63,7 +63,7 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
-        
+
         <!-- Hero Section -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
             <!-- Left Side: Hero Text -->
@@ -72,12 +72,12 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                     Sistem Informasi Dasawisma
                 </span>
-                
+
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-none">
                     Aplikasi Pengelolaan Data <br class="hidden sm:inline" />
                     <span class="text-amber-600">Dasawisma</span> Berbasis Web
                 </h1>
-                
+
                 <p class="text-lg text-slate-600 font-medium max-w-xl mx-auto lg:mx-0">
                     Memudahkan pengelolaan data anggota keluarga dan penyebaran informasi secara cepat menggunakan fitur WhatsApp Broadcast Message.
                 </p>
@@ -104,7 +104,7 @@
             <!-- Right Side: Hero Image -->
             <div class="lg:col-span-5 relative">
                 <div class="absolute inset-0 bg-amber-100/40 rounded-[2.5rem] blur-2xl transform rotate-3 -z-10 scale-95 pointer-events-none"></div>
-                <img src="{{ asset('images/dasawisma_hero.png') }}" alt="Aplikasi Dasawisma" class="w-full max-w-lg mx-auto rounded-[2rem] shadow-2xl border-8 border-white transform hover:scale-[1.01] transition duration-500 ease-out">
+                <img src="{{ asset('images/dasawisma_hero.jpeg') }}" alt="Aplikasi Dasawisma" class="w-full max-w-lg mx-auto rounded-[2rem] shadow-2xl border-8 border-white transform hover:scale-[1.01] transition duration-500 ease-out">
             </div>
         </section>
 
@@ -163,18 +163,18 @@
 
         <!-- About & Features Section -->
         <section id="tentang" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch mb-16 scroll-mt-24">
-            
+
             <!-- About Section -->
             <div class="lg:col-span-7 flex flex-col justify-between bg-white p-8 sm:p-10 rounded-[2rem] border border-amber-100/80 shadow-sm shadow-amber-100/20">
                 <div class="space-y-6">
                     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200/30 text-xs font-extrabold uppercase tracking-widest">
                         ℹ️ Tentang Aplikasi
                     </div>
-                    
+
                     <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                         TENTANG APLIKASI
                     </h2>
-                    
+
                     <p class="text-lg text-slate-600 leading-relaxed font-medium">
                         Aplikasi ini digunakan untuk mengelola data anggota Dasawisma, data keluarga, kegiatan Dasawisma, serta mengirim informasi kepada seluruh anggota melalui fitur Broadcast Message secara cepat dan efisien.
                     </p>
@@ -256,9 +256,8 @@
                     Aplikasi Pengelolaan Data Dasawisma Berbasis Web
                 </p>
             </div>
-            
+
             <div class="text-sm">
-                <span class="block text-slate-200 font-bold">Jorong Padang Rantang</span>
                 <span class="block text-xs text-slate-500 mt-1">© 2026 Hak Cipta Dilindungi Undang-Undang</span>
             </div>
         </div>
