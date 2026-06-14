@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Dasawisma Padang Rantang - Aplikasi Pengelolaan Data & Broadcast</title>
+    <title>Dasawisma</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,6 @@
                 </div>
                 <div>
                     <span class="text-xl font-bold tracking-tight text-slate-900">DASAWISMA</span>
-                    <span class="block text-xs font-semibold text-amber-600/80 tracking-wider uppercase -mt-1">Padang Rantang</span>
                 </div>
             </div>
 

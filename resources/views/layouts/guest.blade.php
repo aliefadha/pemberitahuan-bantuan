@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Pemberitahuan Bantuan') }}</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 
@@ -31,7 +31,7 @@
 
     <div class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
         <div class="w-full max-w-md">
-            
+
             <!-- Logo Section -->
             <div class="flex flex-col items-center mb-8">
                 <div class="w-12 h-12 rounded-xl bg-amber-100/80 border border-amber-200/50 flex items-center justify-center shadow-sm mb-3">
@@ -40,7 +40,6 @@
                     </svg>
                 </div>
                 <span class="text-xl font-bold tracking-tight text-slate-900">DASAWISMA</span>
-                <span class="block text-xxs font-semibold text-amber-600/80 tracking-wider uppercase -mt-0.5">Padang Rantang</span>
             </div>
 
             <!-- Card Box -->
