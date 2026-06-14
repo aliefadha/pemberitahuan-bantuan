@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
             {{ __('Dashboard') }}
         </h2>
@@ -12,28 +12,28 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
         @if(auth()->user()->isAdmin())
             <!-- Total Users -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+            <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Users</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ \App\Models\User::count() }}</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Users</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1">{{ $stats['totalUsers'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 bg-amber-50 border border-amber-100/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                     </div>
                 </div>
             </div>
             <!-- Total Kelompok -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+            <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Kelompok</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ \App\Models\Kelompok::count() }}</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Kelompok</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1">{{ $stats['totalKelompoks'] }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 bg-amber-100/50 border border-amber-200/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
@@ -41,14 +41,14 @@
             </div>
         @else
             <!-- Jorong Anda -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+            <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Jorong Anda</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ auth()->user()->jorong_label ?? '-' }}</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Jorong Anda</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1">{{ auth()->user()->jorong_label ?? '-' }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 bg-amber-50 border border-amber-100/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
@@ -56,14 +56,14 @@
                 </div>
             </div>
             <!-- Kelompok Anda -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+            <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Kelompok Anda</p>
-                        <p class="text-2xl font-bold text-gray-900 mt-1">{{ auth()->user()->kelompok ? auth()->user()->kelompok->name : '-' }}</p>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kelompok Anda</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1">{{ auth()->user()->kelompok ? auth()->user()->kelompok->name : '-' }}</p>
                     </div>
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 bg-amber-100/50 border border-amber-200/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
@@ -72,14 +72,14 @@
         @endif
 
         <!-- Total Kegiatan -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+        <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Kegiatan</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['totalKegiatans'] }}</p>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Kegiatan</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1">{{ $stats['totalKegiatans'] }}</p>
                 </div>
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-amber-100 border border-amber-200/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
@@ -88,50 +88,50 @@
 
         @if(auth()->user()->isAdmin())
         <!-- Anggota Hamil (Compared with All) -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+        <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Keluarga Hamil</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['totalHamil'] }}</p>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Keluarga Hamil</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1">{{ $stats['totalHamil'] }}</p>
                 </div>
-                <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-amber-50 border border-amber-100/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                 </div>
             </div>
-            <div class="mt-2 text-xs text-gray-500 leading-tight">
+            <div class="mt-2 text-xs text-slate-500 font-medium leading-tight">
                 {{ $stats['totalHamil'] }} dari {{ $stats['totalAnggota'] }} ({{ $stats['totalAnggota'] > 0 ? round(($stats['totalHamil'] / $stats['totalAnggota']) * 100, 1) : 0 }}%)
             </div>
         </div>
 
         <!-- Anggota Meninggal (Compared with All) -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-between">
+        <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6 flex flex-col justify-between hover:shadow-md transition">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Keluarga Meninggal</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['totalMeninggal'] }}</p>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Keluarga Meninggal</p>
+                    <p class="text-2xl font-black text-slate-900 mt-1">{{ $stats['totalMeninggal'] }}</p>
                 </div>
-                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-amber-100/50 border border-amber-200/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                     </svg>
                 </div>
             </div>
-            <div class="mt-2 text-xs text-gray-500 leading-tight">
+            <div class="mt-2 text-xs text-slate-500 font-medium leading-tight">
                 {{ $stats['totalMeninggal'] }} dari {{ $stats['totalAnggota'] }} ({{ $stats['totalAnggota'] > 0 ? round(($stats['totalMeninggal'] / $stats['totalAnggota']) * 100, 1) : 0 }}%)
             </div>
         </div>
         @endif
     </div>
 
-    @if(auth()->user()->isAdmin())
+    @if(auth()->user()->role === 'admin')
     <!-- Main Charts Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Kegiatan per Jorong -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6">
+            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
                 Kegiatan per Jorong
@@ -142,9 +142,9 @@
         </div>
 
         <!-- Kelompok per Jorong -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 p-6">
+            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
                 Kelompok per Jorong
@@ -157,60 +157,57 @@
     @endif
 
     <!-- Active Kegiatan -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white rounded-xl shadow-sm border border-amber-100/70 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-amber-100/60">
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Kegiatan yang Akan Datang
             </h3>
         </div>
-        <div class="divide-y divide-gray-200">
+        <div class="divide-y divide-slate-100">
             @forelse($activeKegiatans as $kegiatan)
-                <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 transition">
+                <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-amber-50/10 transition">
                     <div>
-                        <h4 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <h4 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                             {{ $kegiatan->judul }}
-                            <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-50 text-amber-800 border border-amber-200/50">
                                 {{ $kegiatan->jorong_label ?? '-' }}
                             </span>
                         </h4>
-                        <p class="text-sm text-gray-500 mt-1">{{ $kegiatan->tanggal->format('d M Y H:i') }} WIB</p>
-                        <p class="text-sm text-gray-600 mt-2">{{ Str::limit($kegiatan->deskripsi, 150) }}</p>
+                        <p class="text-sm font-medium text-slate-400 mt-1">{{ $kegiatan->tanggal->format('d M Y H:i') }} WIB</p>
+                        <p class="text-sm text-slate-600 mt-2">{{ Str::limit($kegiatan->deskripsi, 150) }}</p>
                     </div>
                     <div class="flex-shrink-0">
                         @if(auth()->user()->isAdmin())
-                            <a href="{{ route('admin.kegiatans.show', $kegiatan) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
+                            <a href="{{ route('admin.kegiatans.show', $kegiatan) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-200/60 text-sm font-bold rounded-xl shadow-sm transition duration-150">
                                 Detail Peserta
                             </a>
                         @else
-                            <a href="{{ route('kegiatan.show', $kegiatan) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
+                            <a href="{{ route('kegiatan.show', $kegiatan) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-200/60 text-sm font-bold rounded-xl shadow-sm transition duration-150">
                                 Lihat & Beri Tanggapan
                             </a>
                         @endif
                     </div>
                 </div>
             @empty
-                <div class="p-8 text-center text-gray-500 italic">Tidak ada kegiatan aktif dalam waktu dekat.</div>
+                <div class="p-8 text-center text-slate-400 italic">Tidak ada kegiatan aktif dalam waktu dekat.</div>
             @endforelse
         </div>
     </div>
 
-    @if(auth()->user()->isAdmin())
+    @if(auth()->user()->role === 'admin')
     <!-- ChartJS Implementation -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Colors configuration
+            // Soft Yellow/Amber theme colors configuration
             const colors = {
-                blue: '#3b82f6',
-                emerald: '#10b981',
                 amber: '#f59e0b',
-                purple: '#8b5cf6',
-                pink: '#ec4899',
-                red: '#ef4444',
-                gray: '#9ca3af'
+                gold: '#d97706',
+                yellow: '#eab308',
+                slate: '#64748b'
             };
 
             // 1. Kegiatan per Jorong Chart
@@ -224,8 +221,8 @@
                     datasets: [{
                         label: 'Kegiatan',
                         data: kegiatanData,
-                        backgroundColor: colors.blue,
-                        borderRadius: 4
+                        backgroundColor: colors.gold,
+                        borderRadius: 6
                     }]
                 },
                 options: {
@@ -237,7 +234,14 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { stepSize: 1, precision: 0 }
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: { stepSize: 1, precision: 0, color: colors.slate }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: colors.slate }
                         }
                     }
                 }
@@ -253,8 +257,8 @@
                     datasets: [{
                         label: 'Kelompok',
                         data: kelompokData,
-                        backgroundColor: colors.purple,
-                        borderRadius: 4
+                        backgroundColor: colors.yellow,
+                        borderRadius: 6
                     }]
                 },
                 options: {
@@ -266,7 +270,14 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { stepSize: 1, precision: 0 }
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: { stepSize: 1, precision: 0, color: colors.slate }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: colors.slate }
                         }
                     }
                 }

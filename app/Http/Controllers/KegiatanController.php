@@ -54,7 +54,7 @@ class KegiatanController extends Controller
             auth()->id() => ['status' => $request->status],
         ]);
 
-        $admins = \App\Models\User::where('role', 'admin')->get();
+        $admins = \App\Models\User::whereIn('role', ['admin', 'kader'])->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\KegiatanResponseNotification($kegiatan, auth()->user(), $request->status));
         }

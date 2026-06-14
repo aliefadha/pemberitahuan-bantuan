@@ -44,17 +44,37 @@
                         <p class="mt-1 text-sm text-gray-500">Contoh: 081234567890</p>
                     </div>
 
-                    <div>
-                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                        <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('role') border-red-500 @enderror" id="role" name="role" required>
-                            <option value="">-- Pilih Role --</option>
-                            <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="peserta" {{ old('role', $user->role) == 'peserta' ? 'selected' : '' }}>Peserta</option>
-                        </select>
-                        @error('role')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    @if(auth()->user()->isKader())
+                        <input type="hidden" id="role" name="role" value="{{ $user->role }}">
+                        <input type="hidden" id="jorong" name="jorong" value="{{ $user->jorong }}">
+                    @else
+                        <div>
+                            <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('role') border-red-500 @enderror" id="role" name="role" required>
+                                <option value="">-- Pilih Role --</option>
+                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="peserta" {{ old('role', $user->role) == 'peserta' ? 'selected' : '' }}>Peserta</option>
+                                <option value="kader" {{ old('role', $user->role) == 'kader' ? 'selected' : '' }}>Kader</option>
+                            </select>
+                            @error('role')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div id="jorong-container">
+                            <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong <span class="text-red-500">*</span></label>
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('jorong') border-red-500 @enderror" id="jorong" name="jorong">
+                                <option value="">-- Pilih Jorong --</option>
+                                <option value="padang_rantang" {{ old('jorong', $user->jorong) == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                                <option value="tanjung_pati" {{ old('jorong', $user->jorong) == 'tanjung_pati' ? 'selected' : '' }}>Tanjung Pati</option>
+                                <option value="koto_tuo" {{ old('jorong', $user->jorong) == 'koto_tuo' ? 'selected' : '' }}>Koto Tuo</option>
+                                <option value="pulutan" {{ old('jorong', $user->jorong) == 'pulutan' ? 'selected' : '' }}>Pulutan</option>
+                            </select>
+                            @error('jorong')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
 
                     <div>
                         <label for="kelompok_id" class="block text-sm font-medium text-gray-700 mb-1">Kelompok</label>
@@ -95,8 +115,7 @@
                         </div>
                     </div>
 
-                    @if($user->role === 'peserta')
-                    <div class="border-t border-gray-200 pt-6 mt-6">
+                    <div id="bio-data-container" class="border-t border-gray-200 pt-6 mt-6">
                         <h4 class="text-base font-semibold text-gray-800 mb-4">Data Bio Peserta</h4>
                         <div class="space-y-6">
                             @foreach($sections as $section)
@@ -113,7 +132,7 @@
                                                     <input type="number"
                                                         id="bio_data_{{ $q['key'] }}"
                                                         name="bio_data[{{ $q['key'] }}]"
-                                                        value="{{ old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') }}"
+                                                        value="{{ old('bio_data.' . $q['key'], is_array($user->bio_data) ? ($user->bio_data[$q['key']] ?? '') : '') }}"
                                                         @isset($q['min']) min="{{ $q['min'] }}" @endisset
                                                         @isset($q['max']) max="{{ $q['max'] }}" @endisset
                                                         class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500"
@@ -123,8 +142,8 @@
                                                         name="bio_data[{{ $q['key'] }}]"
                                                         class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500">
                                                         <option value="">Pilih</option>
-                                                        <option value="1" {{ (string)old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') === '1' ? 'selected' : '' }}>Ya</option>
-                                                        <option value="0" {{ (string)old('bio_data.' . $q['key'], $user->bio_data[$q['key']] ?? '') === '0' ? 'selected' : '' }}>Tidak</option>
+                                                        <option value="1" {{ (string)old('bio_data.' . $q['key'], is_array($user->bio_data) ? ($user->bio_data[$q['key']] ?? '') : '') === '1' ? 'selected' : '' }}>Ya</option>
+                                                        <option value="0" {{ (string)old('bio_data.' . $q['key'], is_array($user->bio_data) ? ($user->bio_data[$q['key']] ?? '') : '') === '0' ? 'selected' : '' }}>Tidak</option>
                                                     </select>
                                                 @endif
                                             </div>
@@ -134,10 +153,9 @@
                             @endforeach
                         </div>
                     </div>
-                    @endif
 
                     {{-- Anggota Keluarga Section --}}
-                    <div class="border-t border-gray-200 pt-6 mt-6">
+                    <div id="anggota-keluarga-container" class="border-t border-gray-200 pt-6 mt-6">
                         <div class="flex items-center justify-between mb-3">
                             <h4 class="text-base font-semibold text-gray-800">Anggota Keluarga</h4>
                             <button type="button" id="btn-add-anggota-edit"
@@ -277,6 +295,59 @@
 
                         updateHint();
                     })();
+                    </script>
+
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var roleSelect = document.getElementById('role');
+                        var jorongContainer = document.getElementById('jorong-container');
+                        var jorongSelect = document.getElementById('jorong');
+                        var anggotaKeluargaContainer = document.getElementById('anggota-keluarga-container');
+                        var bioDataContainer = document.getElementById('bio-data-container');
+
+                        function handleRoleChange() {
+                            var selectedRole = roleSelect ? roleSelect.value : 'peserta';
+
+                            // Show family members and bio data only if role is 'peserta'
+                            if (selectedRole === 'peserta') {
+                                if (anggotaKeluargaContainer) {
+                                    anggotaKeluargaContainer.style.display = 'block';
+                                }
+                                if (bioDataContainer) {
+                                    bioDataContainer.style.display = 'block';
+                                }
+                            } else {
+                                if (anggotaKeluargaContainer) {
+                                    anggotaKeluargaContainer.style.display = 'none';
+                                }
+                                if (bioDataContainer) {
+                                    bioDataContainer.style.display = 'none';
+                                }
+                            }
+
+                            // Hide jorong input for 'admin', show and make required for others
+                            if (selectedRole === 'admin') {
+                                if (jorongContainer) {
+                                    jorongContainer.style.display = 'none';
+                                }
+                                if (jorongSelect) {
+                                    jorongSelect.removeAttribute('required');
+                                }
+                            } else {
+                                if (jorongContainer) {
+                                    jorongContainer.style.display = 'block';
+                                }
+                                if (jorongSelect && jorongSelect.tagName === 'SELECT') {
+                                    jorongSelect.setAttribute('required', 'required');
+                                }
+                            }
+                        }
+
+                        if (roleSelect && roleSelect.tagName === 'SELECT') {
+                            roleSelect.addEventListener('change', handleRoleChange);
+                        }
+                        handleRoleChange(); // Run on initial load
+                    });
                     </script>
 
                     <div class="pt-4 flex items-center gap-3">

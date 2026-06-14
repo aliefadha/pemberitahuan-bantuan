@@ -43,17 +43,37 @@
                         <p class="mt-1 text-sm text-gray-500">Contoh: 081234567890</p>
                     </div>
 
-                    <div>
-                        <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                        <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('role') border-red-500 @enderror" id="role" name="role" required>
-                            <option value="" disabled selected>-- Pilih Role --</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="peserta" {{ old('role') == 'peserta' ? 'selected' : '' }}>Peserta</option>
-                        </select>
-                        @error('role')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    @if(auth()->user()->isKader())
+                        <input type="hidden" id="role" name="role" value="peserta">
+                        <input type="hidden" id="jorong" name="jorong" value="{{ auth()->user()->jorong }}">
+                    @else
+                        <div>
+                            <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('role') border-red-500 @enderror" id="role" name="role" required>
+                                <option value="" disabled selected>-- Pilih Role --</option>
+                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="peserta" {{ old('role') == 'peserta' ? 'selected' : '' }}>Peserta</option>
+                                <option value="kader" {{ old('role') == 'kader' ? 'selected' : '' }}>Kader</option>
+                            </select>
+                            @error('role')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div id="jorong-container">
+                            <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong <span class="text-red-500">*</span></label>
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('jorong') border-red-500 @enderror" id="jorong" name="jorong">
+                                <option value="">-- Pilih Jorong --</option>
+                                <option value="padang_rantang" {{ old('jorong') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                                <option value="tanjung_pati" {{ old('jorong') == 'tanjung_pati' ? 'selected' : '' }}>Tanjung Pati</option>
+                                <option value="koto_tuo" {{ old('jorong') == 'koto_tuo' ? 'selected' : '' }}>Koto Tuo</option>
+                                <option value="pulutan" {{ old('jorong') == 'pulutan' ? 'selected' : '' }}>Pulutan</option>
+                            </select>
+                            @error('jorong')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -70,7 +90,9 @@
                         </div>
                     </div>
 
-                    @include('partials.anggota-keluarga-form')
+                    <div id="anggota-keluarga-container">
+                        @include('partials.anggota-keluarga-form')
+                    </div>
 
                     <div class="pt-4 flex items-center gap-3">
                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
@@ -81,4 +103,50 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var roleSelect = document.getElementById('role');
+        var jorongContainer = document.getElementById('jorong-container');
+        var jorongSelect = document.getElementById('jorong');
+        var anggotaKeluargaContainer = document.getElementById('anggota-keluarga-container');
+
+        function handleRoleChange() {
+            var selectedRole = roleSelect ? roleSelect.value : 'peserta';
+
+            // Show family members only if role is 'peserta' (anggota)
+            if (selectedRole === 'peserta') {
+                if (anggotaKeluargaContainer) {
+                    anggotaKeluargaContainer.style.display = 'block';
+                }
+            } else {
+                if (anggotaKeluargaContainer) {
+                    anggotaKeluargaContainer.style.display = 'none';
+                }
+            }
+
+            // Hide jorong input for 'admin', show and make required for others
+            if (selectedRole === 'admin') {
+                if (jorongContainer) {
+                    jorongContainer.style.display = 'none';
+                }
+                if (jorongSelect) {
+                    jorongSelect.removeAttribute('required');
+                }
+            } else {
+                if (jorongContainer) {
+                    jorongContainer.style.display = 'block';
+                }
+                if (jorongSelect && jorongSelect.tagName === 'SELECT') {
+                    jorongSelect.setAttribute('required', 'required');
+                }
+            }
+        }
+
+        if (roleSelect && roleSelect.tagName === 'SELECT') {
+            roleSelect.addEventListener('change', handleRoleChange);
+        }
+        handleRoleChange(); // Run on initial load
+    });
+    </script>
 </x-app-layout>

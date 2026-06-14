@@ -42,18 +42,41 @@ class DashboardController extends Controller
         }
 
         if ($user->isAdmin()) {
-            $stats = [
-                'totalPesertas' => User::where('role', 'peserta')->count(),
-                'totalKegiatans' => Kegiatan::count(),
-                'totalAnggota' => \App\Models\AnggotaKeluarga::count(),
-                'totalHamil' => \App\Models\AnggotaKeluarga::where('status', 'hamil')->count(),
-                'totalMeninggal' => \App\Models\AnggotaKeluarga::where('status', 'meninggal')->count(),
-            ];
+            if ($user->role === 'admin') {
+                $stats = [
+                    'totalUsers' => User::count(),
+                    'totalKelompoks' => Kelompok::count(),
+                    'totalKegiatans' => Kegiatan::count(),
+                    'totalAnggota' => \App\Models\AnggotaKeluarga::count(),
+                    'totalHamil' => \App\Models\AnggotaKeluarga::where('status', 'hamil')->count(),
+                    'totalMeninggal' => \App\Models\AnggotaKeluarga::where('status', 'meninggal')->count(),
+                ];
 
-            $activeKegiatans = Kegiatan::where('tanggal', '>', now())->get();
+                $activeKegiatans = Kegiatan::where('tanggal', '>', now())->get();
+                $kelompoks = Kelompok::with(['users.anggotaKeluarga'])->get();
+                $unassignedUsers = User::whereNull('kelompok_id')->with('anggotaKeluarga')->get();
+            } else {
+                // Kader role
+                $stats = [
+                    'totalUsers' => User::where('jorong', $user->jorong)->count(),
+                    'totalKelompoks' => Kelompok::where('jorong', $user->jorong)->count(),
+                    'totalKegiatans' => Kegiatan::where('jorong', $user->jorong)->count(),
+                    'totalAnggota' => \App\Models\AnggotaKeluarga::whereHas('user', function($q) use ($user) {
+                        $q->where('jorong', $user->jorong);
+                    })->count(),
+                    'totalHamil' => \App\Models\AnggotaKeluarga::where('status', 'hamil')->whereHas('user', function($q) use ($user) {
+                        $q->where('jorong', $user->jorong);
+                    })->count(),
+                    'totalMeninggal' => \App\Models\AnggotaKeluarga::where('status', 'meninggal')->whereHas('user', function($q) use ($user) {
+                        $q->where('jorong', $user->jorong);
+                    })->count(),
+                ];
 
-            // Family stats grouped by Kelompok
-            $kelompoks = Kelompok::with(['users.anggotaKeluarga'])->get();
+                $activeKegiatans = Kegiatan::where('tanggal', '>', now())->where('jorong', $user->jorong)->get();
+                $kelompoks = Kelompok::where('jorong', $user->jorong)->with(['users.anggotaKeluarga'])->get();
+                $unassignedUsers = User::whereNull('kelompok_id')->where('jorong', $user->jorong)->with('anggotaKeluarga')->get();
+            }
+
             $familyStats = [];
 
             foreach ($kelompoks as $kelompok) {
@@ -81,8 +104,6 @@ class DashboardController extends Controller
                 ];
             }
 
-            // Unassigned users (Tanpa Kelompok)
-            $unassignedUsers = User::whereNull('kelompok_id')->with('anggotaKeluarga')->get();
             $unassignedHamil = 0;
             $unassignedMeninggal = 0;
             $unassignedNormal = 0;

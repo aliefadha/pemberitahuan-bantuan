@@ -16,7 +16,13 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $query = User::latest();
+
+        if (auth()->user()->isKader()) {
+            $query->where('jorong', auth()->user()->jorong);
+        }
+
+        $users = $query->paginate(10);
 
         return view('admin.users.index', compact('users'));
     }
@@ -28,11 +34,26 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->isKader()) {
+            $request->merge(['jorong' => auth()->user()->jorong]);
+        }
+
+        $rolesAllowed = auth()->user()->isKader() ? ['peserta'] : ['admin', 'peserta', 'kader'];
+        $jorongRules = [$request->role === 'admin' ? 'nullable' : 'required', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
+        if (auth()->user()->isKader()) {
+            $jorongRules[] = function ($attribute, $value, $fail) {
+                if ($value !== auth()->user()->jorong) {
+                    $fail('Anda hanya dapat memilih jorong Anda sendiri.');
+                }
+            };
+        }
+
         $request->validate([
             'name'       => ['required', 'string', 'max:255'],
             'email'      => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'role'       => ['required', 'in:admin,peserta'],
+            'role'       => ['required', Rule::in($rolesAllowed)],
             'no_telepon' => ['required', 'string', 'max:20', 'unique:users'],
+            'jorong'     => $jorongRules,
             'password'   => ['required', 'confirmed', Rules\Password::defaults()],
             'anggota_keluarga'                         => ['nullable', 'array'],
             'anggota_keluarga.*.nama'                  => ['required', 'string', 'max:255'],
@@ -51,6 +72,7 @@ class UserController extends Controller
                 'role'       => $request->role,
                 'no_telepon' => $request->no_telepon,
                 'password'   => Hash::make($request->password),
+                'jorong'     => $request->jorong,
             ]);
 
             foreach ($request->input('anggota_keluarga', []) as $anggota) {
@@ -63,18 +85,45 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        if (auth()->user()->isKader() && $user->jorong !== auth()->user()->jorong) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $sections  = config('bio.sections');
-        $kelompoks = Kelompok::orderBy('jorong')->orderBy('name')->get();
+        
+        $kelompoksQuery = Kelompok::orderBy('jorong')->orderBy('name');
+        if (auth()->user()->isKader()) {
+            $kelompoksQuery->where('jorong', auth()->user()->jorong);
+        }
+        $kelompoks = $kelompoksQuery->get();
 
         return view('admin.users.edit', compact('user', 'sections', 'kelompoks'));
     }
 
     public function update(Request $request, User $user)
     {
+        if (auth()->user()->isKader() && ($user->jorong !== auth()->user()->jorong || $user->role === 'admin')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (auth()->user()->isKader()) {
+            $request->merge(['jorong' => auth()->user()->jorong]);
+        }
+
+        $rolesAllowed = auth()->user()->isKader() ? [$user->role] : ['admin', 'peserta', 'kader'];
+        $jorongRules = [$request->role === 'admin' ? 'nullable' : 'required', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
+        if (auth()->user()->isKader()) {
+            $jorongRules[] = function ($attribute, $value, $fail) {
+                if ($value !== auth()->user()->jorong) {
+                    $fail('Anda hanya dapat memilih jorong Anda sendiri.');
+                }
+            };
+        }
+
         $request->validate([
             'name'       => ['required', 'string', 'max:255'],
             'email'      => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'role'       => ['required', 'in:admin,peserta'],
+            'role'       => ['required', Rule::in($rolesAllowed)],
             'no_telepon' => ['nullable', 'string', 'max:20', Rule::unique('users', 'no_telepon')->ignore($user->id)],
             'password'   => ['nullable', 'confirmed', Rules\Password::defaults()],
             'anggota_keluarga'                         => ['nullable', 'array'],
@@ -86,6 +135,7 @@ class UserController extends Controller
             'anggota_keluarga.*.pekerjaan'             => ['nullable', 'string', 'max:255'],
             'anggota_keluarga.*.status'                => ['nullable', 'in:meninggal,hamil'],
             'kelompok_id'                              => ['nullable', 'exists:kelompoks,id'],
+            'jorong'                                   => $jorongRules,
         ]);
 
         DB::transaction(function () use ($request, $user) {
@@ -95,6 +145,7 @@ class UserController extends Controller
                 'role'        => $request->role,
                 'no_telepon'  => $request->no_telepon,
                 'kelompok_id' => $request->kelompok_id ?: null,
+                'jorong'      => $request->jorong,
             ]);
 
             if ($request->filled('password')) {
@@ -132,6 +183,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if (auth()->user()->isKader() && ($user->jorong !== auth()->user()->jorong || $user->role === 'admin')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');

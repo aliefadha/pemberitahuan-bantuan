@@ -36,6 +36,7 @@
                         <th class="px-6 py-3">Email</th>
                         <th class="px-6 py-3">No. HP</th>
                         <th class="px-6 py-3">Role</th>
+                        <th class="px-6 py-3">Jorong</th>
                         <th class="px-6 py-3">Tanggal Daftar</th>
                         <th class="px-6 py-3">Aksi</th>
                     </tr>
@@ -57,6 +58,13 @@
                             <span class="px-2 py-1 text-xs font-medium rounded-full {{ $user->isAdmin() ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
                                 {{ ucfirst($user->role) }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">
+                            @if($user->jorong)
+                                {{ $user->jorong_label }}
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-gray-600">{{ $user->created_at->format('d/m/Y') }}</td>
                         <td class="px-6 py-4">

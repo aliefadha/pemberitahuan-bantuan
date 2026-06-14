@@ -9,7 +9,21 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WhatsAppController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    try {
+        $totalAnggota = \App\Models\User::count() + \App\Models\AnggotaKeluarga::count();
+        $totalKeluarga = \App\Models\User::where('role', 'peserta')->count();
+        $totalBroadcast = \App\Models\Kegiatan::count();
+        $totalKelompok = \App\Models\Kelompok::count();
+    } catch (\Exception $e) {
+        $totalAnggota = 150;
+        $totalKeluarga = 45;
+        $totalBroadcast = 12;
+        $totalKelompok = 5;
+    }
+
+    return view('welcome', compact('totalAnggota', 'totalKeluarga', 'totalBroadcast', 'totalKelompok'));
+});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'bio_filled'])

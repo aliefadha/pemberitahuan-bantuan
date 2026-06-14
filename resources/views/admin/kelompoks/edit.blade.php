@@ -29,13 +29,20 @@
 
                     <div>
                         <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong <span class="text-red-500">*</span></label>
-                        <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('jorong') border-red-500 @enderror" id="jorong" name="jorong" required>
-                            <option value="">-- Pilih Jorong --</option>
-                            <option value="padang_rantang" {{ old('jorong', $kelompok->jorong) == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
-                            <option value="tanjung_pati"   {{ old('jorong', $kelompok->jorong) == 'tanjung_pati'   ? 'selected' : '' }}>Tanjung Pati</option>
-                            <option value="koto_tuo"       {{ old('jorong', $kelompok->jorong) == 'koto_tuo'       ? 'selected' : '' }}>Koto Tuo</option>
-                            <option value="pulutan"        {{ old('jorong', $kelompok->jorong) == 'pulutan'        ? 'selected' : '' }}>Pulutan</option>
-                        </select>
+                        @if(auth()->user()->isKader())
+                            <select class="w-full rounded-lg border border-gray-300 bg-gray-100 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500" id="jorong_disabled" disabled>
+                                <option value="{{ auth()->user()->jorong }}" selected>{{ auth()->user()->jorong_label }}</option>
+                            </select>
+                            <input type="hidden" name="jorong" value="{{ auth()->user()->jorong }}">
+                        @else
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('jorong') border-red-500 @enderror" id="jorong" name="jorong" required>
+                                <option value="">-- Pilih Jorong --</option>
+                                <option value="padang_rantang" {{ old('jorong', $kelompok->jorong) == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                                <option value="tanjung_pati"   {{ old('jorong', $kelompok->jorong) == 'tanjung_pati'   ? 'selected' : '' }}>Tanjung Pati</option>
+                                <option value="koto_tuo"       {{ old('jorong', $kelompok->jorong) == 'koto_tuo'       ? 'selected' : '' }}>Koto Tuo</option>
+                                <option value="pulutan"        {{ old('jorong', $kelompok->jorong) == 'pulutan'        ? 'selected' : '' }}>Pulutan</option>
+                            </select>
+                        @endif
                         @error('jorong')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -58,7 +65,7 @@
                                         class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
                                     >
                                     <span class="flex-1 text-sm text-gray-800 font-medium">{{ $user->name }}</span>
-                                    <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ $user->role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
+                                    <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ $user->role === 'admin' || $user->role === 'kader' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
                                         {{ ucfirst($user->role) }}
                                     </span>
                                 </label>

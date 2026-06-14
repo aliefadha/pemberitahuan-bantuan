@@ -14,7 +14,11 @@ class KelompokController extends Controller
 {
     public function index()
     {
-        $kelompoks = Kelompok::withCount('users')->paginate(10);
+        $query = Kelompok::withCount('users');
+        if (auth()->user()->isKader()) {
+            $query->where('jorong', auth()->user()->jorong);
+        }
+        $kelompoks = $query->paginate(10);
 
         return view('admin.kelompoks.index', compact('kelompoks'));
     }
@@ -26,9 +30,22 @@ class KelompokController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->isKader()) {
+            $request->merge(['jorong' => auth()->user()->jorong]);
+        }
+
+        $jorongRules = ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
+        if (auth()->user()->isKader()) {
+            $jorongRules[] = function ($attribute, $value, $fail) {
+                if ($value !== auth()->user()->jorong) {
+                    $fail('Anda hanya dapat membuat kelompok di jorong Anda sendiri.');
+                }
+            };
+        }
+
         $request->validate([
             'name'   => ['required', 'string', 'max:255'],
-            'jorong' => ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'],
+            'jorong' => $jorongRules,
         ]);
 
         Kelompok::create([
@@ -41,17 +58,43 @@ class KelompokController extends Controller
 
     public function edit(Kelompok $kelompok)
     {
+        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $kelompok->load('users');
-        $allUsers = User::orderBy('name')->get(['id', 'name', 'kelompok_id', 'role', 'jorong']);
+        
+        $allUsersQuery = User::orderBy('name');
+        if (auth()->user()->isKader()) {
+            $allUsersQuery->where('jorong', auth()->user()->jorong);
+        }
+        $allUsers = $allUsersQuery->get(['id', 'name', 'kelompok_id', 'role', 'jorong']);
 
         return view('admin.kelompoks.edit', compact('kelompok', 'allUsers'));
     }
 
     public function update(Request $request, Kelompok $kelompok)
     {
+        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (auth()->user()->isKader()) {
+            $request->merge(['jorong' => auth()->user()->jorong]);
+        }
+
+        $jorongRules = ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
+        if (auth()->user()->isKader()) {
+            $jorongRules[] = function ($attribute, $value, $fail) {
+                if ($value !== auth()->user()->jorong) {
+                    $fail('Anda hanya dapat merubah kelompok di jorong Anda sendiri.');
+                }
+            };
+        }
+
         $request->validate([
             'name'   => ['required', 'string', 'max:255'],
-            'jorong' => ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'],
+            'jorong' => $jorongRules,
         ]);
 
         DB::transaction(function () use ($request, $kelompok) {
@@ -61,6 +104,15 @@ class KelompokController extends Controller
             ]);
 
             $submittedUserIds = $request->input('users', []);
+
+            if (auth()->user()->isKader() && !empty($submittedUserIds)) {
+                $count = User::whereIn('id', $submittedUserIds)
+                    ->where('jorong', '!=', auth()->user()->jorong)
+                    ->count();
+                if ($count > 0) {
+                    abort(403, 'Anda hanya dapat memasukkan user dari jorong Anda sendiri.');
+                }
+            }
 
             // Users currently in this kelompok but NOT in submitted list → nullify
             User::where('kelompok_id', $kelompok->id)
@@ -79,6 +131,10 @@ class KelompokController extends Controller
 
     public function destroy(Kelompok $kelompok)
     {
+        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+            abort(403, 'Unauthorized action.');
+        }
+
         DB::transaction(function () use ($kelompok) {
             // Nullify all users' kelompok_id first
             User::where('kelompok_id', $kelompok->id)->update(['kelompok_id' => null]);
@@ -91,7 +147,11 @@ class KelompokController extends Controller
 
     public function exportPdf()
     {
-        $kelompoks = Kelompok::withCount('users')->get();
+        $query = Kelompok::withCount('users');
+        if (auth()->user()->isKader()) {
+            $query->where('jorong', auth()->user()->jorong);
+        }
+        $kelompoks = $query->get();
 
         Carbon::setLocale('id');
 
@@ -103,6 +163,10 @@ class KelompokController extends Controller
 
     public function exportPdfDetail(Kelompok $kelompok)
     {
+        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $kelompok->load(['users' => function($query) {
             $query->orderBy('name');
         }]);
