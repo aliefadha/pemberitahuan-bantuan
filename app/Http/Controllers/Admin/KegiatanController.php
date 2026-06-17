@@ -58,9 +58,8 @@ class KegiatanController extends Controller
             'jorong' => $request->jorong,
         ]);
 
-        $query = User::where('id', '!=', auth()->id())
-            ->whereNotNull('bio_data')
-            ->where('bio_data', '!=', '[]');
+        $query = User::where('role', 'peserta')
+            ->whereNotNull('no_telepon');
 
         if ($kegiatan->jorong) {
             $query->where('jorong', $kegiatan->jorong);
@@ -101,9 +100,8 @@ class KegiatanController extends Controller
         if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
             abort(403, 'Unauthorized action.');
         }
-        $query = User::where('id', '!=', auth()->id())
-            ->whereNotNull('bio_data')
-            ->where('bio_data', '!=', '[]');
+        $query = User::where('role', 'peserta')
+            ->whereNotNull('no_telepon');
 
         if ($kegiatan->jorong) {
             $query->where('jorong', $kegiatan->jorong);

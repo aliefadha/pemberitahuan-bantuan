@@ -56,13 +56,6 @@
                             </span>
                         </div>
                     </div>
-                    <a href="{{ route('bio.edit') }}"
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        Edit Bio
-                    </a>
                 </div>
             </div>
         </div>
@@ -77,16 +70,13 @@
         @endif
 
         @if(empty($bioData))
-            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 flex items-start gap-4">
-                <svg class="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 flex items-start gap-4">
+                <svg class="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <div>
-                    <p class="font-semibold text-yellow-800">Data Bio Belum Diisi</p>
-                    <p class="text-sm text-yellow-700 mt-1">Anda belum mengisi data bio. Silakan lengkapi data bio Anda.</p>
-                    <a href="{{ route('bio.edit') }}" class="inline-block mt-3 px-4 py-2 bg-yellow-500 text-white text-sm font-medium rounded-lg hover:bg-yellow-600 transition">
-                        Isi Data Bio Sekarang
-                    </a>
+                    <p class="font-semibold text-blue-800">Data Bio Belum Diisi</p>
+                    <p class="text-sm text-blue-700 mt-1">Data biodata Anda belum diisi. Harap hubungi Kader atau Admin jorong Anda untuk melengkapi data bio Anda.</p>
                 </div>
             </div>
         @else

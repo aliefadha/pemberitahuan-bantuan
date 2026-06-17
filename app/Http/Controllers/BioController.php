@@ -8,6 +8,18 @@ use Illuminate\View\View;
 
 class BioController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (in_array($request->route()->getName(), ['bio.edit', 'bio.update'])) {
+                if (auth()->user()->role === 'peserta') {
+                    abort(403, 'Unauthorized action.');
+                }
+            }
+            return $next($request);
+        });
+    }
+
     public function show(): View
     {
         $sections = config('bio.sections');

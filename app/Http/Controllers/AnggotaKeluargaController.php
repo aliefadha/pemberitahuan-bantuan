@@ -7,6 +7,16 @@ use App\Models\AnggotaKeluarga;
 
 class AnggotaKeluargaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()->role === 'peserta') {
+                abort(403, 'Unauthorized action.');
+            }
+            return $next($request);
+        });
+    }
+
     public function create()
     {
         return view('profile.anggota-keluarga-create');
