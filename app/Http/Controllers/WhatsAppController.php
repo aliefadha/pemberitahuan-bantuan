@@ -12,16 +12,18 @@ class WhatsAppController extends Controller
     public function __construct(WhatsAppService $whatsAppService)
     {
         $this->whatsAppService = $whatsAppService;
-        $this->middleware(function ($request, $next) {
-            if (auth()->user()->role !== 'admin') {
-                abort(403, 'Unauthorized action.');
-            }
-            return $next($request);
-        });
+    }
+
+    private function checkAdmin()
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
     }
 
     public function index()
     {
+        $this->checkAdmin();
         $status = $this->whatsAppService->getStatus();
         $qrData = $this->whatsAppService->getQrCode();
 
@@ -34,11 +36,13 @@ class WhatsAppController extends Controller
 
     public function status()
     {
+        $this->checkAdmin();
         return response()->json($this->whatsAppService->getStatus());
     }
 
     public function qr()
     {
+        $this->checkAdmin();
         $qrData = $this->whatsAppService->getQrCode();
 
         return response()->json($qrData);
@@ -46,6 +50,7 @@ class WhatsAppController extends Controller
 
     public function restart()
     {
+        $this->checkAdmin();
         $result = $this->whatsAppService->restart();
 
         return response()->json([
@@ -56,6 +61,7 @@ class WhatsAppController extends Controller
 
     public function sendTest(Request $request)
     {
+        $this->checkAdmin();
         $request->validate([
             'phone' => 'required|string',
             'message' => 'required|string',

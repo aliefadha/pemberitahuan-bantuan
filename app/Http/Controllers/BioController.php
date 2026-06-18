@@ -8,18 +8,6 @@ use Illuminate\View\View;
 
 class BioController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (in_array($request->route()->getName(), ['bio.edit', 'bio.update'])) {
-                if (auth()->user()->role === 'peserta') {
-                    abort(403, 'Unauthorized action.');
-                }
-            }
-            return $next($request);
-        });
-    }
-
     public function show(): View
     {
         $sections = config('bio.sections');
@@ -34,6 +22,9 @@ class BioController extends Controller
 
     public function edit(): View
     {
+        if (auth()->user()->role === 'peserta') {
+            abort(403, 'Unauthorized action.');
+        }
         $sections = config('bio.sections');
         $user = auth()->user();
         $kelompoks = \App\Models\Kelompok::orderBy('jorong')->orderBy('name')->get();
@@ -48,6 +39,9 @@ class BioController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        if (auth()->user()->role === 'peserta') {
+            abort(403, 'Unauthorized action.');
+        }
         $sections = config('bio.sections');
         $rules = [
             'alamat'                                    => ['nullable', 'string', 'max:500'],
