@@ -80,6 +80,7 @@
                 @endif
 
                 <div class="flex items-center gap-3">
+                    {{-- Bersedia form --}}
                     <form method="POST" action="{{ route('kegiatan.respond', $kegiatan) }}">
                         @csrf
                         <input type="hidden" name="status" value="bersedia">
@@ -91,17 +92,58 @@
                         </button>
                     </form>
 
-                    <form method="POST" action="{{ route('kegiatan.respond', $kegiatan) }}">
+                    {{-- Tidak Bersedia button (triggers alasan panel) --}}
+                    <button type="button" id="btn-tidak-bersedia"
+                        onclick="document.getElementById('alasan-panel').classList.toggle('hidden')"
+                        class="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-100 transition shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Tidak Bersedia
+                    </button>
+                </div>
+
+                {{-- Alasan panel (hidden by default) --}}
+                <div id="alasan-panel" class="hidden mt-4">
+                    <form method="POST" action="{{ route('kegiatan.respond', $kegiatan) }}" id="form-tidak-bersedia">
                         @csrf
                         <input type="hidden" name="status" value="tidak_bersedia">
-                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-100 transition shadow-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                            Tidak Bersedia
-                        </button>
+                        <div class="space-y-2">
+                            <label for="alasan" class="block text-sm font-medium text-gray-700">
+                                Alasan tidak bersedia <span class="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                id="alasan"
+                                name="alasan"
+                                rows="3"
+                                required
+                                placeholder="Tuliskan alasan Anda tidak bersedia hadir..."
+                                class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 shadow-sm focus:border-red-400 focus:ring-2 focus:ring-red-100 transition @error('alasan') border-red-500 @enderror"
+                            >{{ old('alasan') }}</textarea>
+                            @error('alasan')
+                                <p class="text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="flex items-center gap-2 mt-3">
+                            <button type="submit"
+                                class="inline-flex items-center gap-2 px-4 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-100 transition shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Konfirmasi Tidak Bersedia
+                            </button>
+                            <button type="button"
+                                onclick="document.getElementById('alasan-panel').classList.add('hidden')"
+                                class="px-4 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                                Batal
+                            </button>
+                        </div>
                     </form>
                 </div>
+
+                @if($errors->has('alasan'))
+                <script>document.addEventListener('DOMContentLoaded', () => document.getElementById('alasan-panel').classList.remove('hidden'));</script>
+                @endif
             </div>
         </div>
 

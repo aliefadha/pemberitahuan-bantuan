@@ -86,6 +86,7 @@
                                 <th class="px-6 py-3">Nama Lengkap</th>
                                 <th class="px-6 py-3">Nomor WhatsApp</th>
                                 <th class="px-6 py-3">Status Kehadiran</th>
+                                <th class="px-6 py-3">Alasan</th>
                                 <th class="px-6 py-3">Waktu Tanggapan</th>
                             </tr>
                         </thead>
@@ -94,6 +95,7 @@
                             @php
                                 $response = $responses[$peserta->id] ?? null;
                                 $status = $response ? $response->status : 'belum_menanggapi';
+                                $alasan = $response ? $response->alasan : null;
                                 $updatedAt = $response ? \Carbon\Carbon::parse($response->updated_at) : null;
                             @endphp
                             <tr class="hover:bg-gray-50">
@@ -130,6 +132,13 @@
                                             </svg>
                                             Belum Menanggapi
                                         </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($status === 'tidak_bersedia' && $alasan)
+                                        <span class="text-xs text-gray-500 italic">{{ $alasan }}</span>
+                                    @else
+                                        <span class="text-gray-400">-</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-gray-500">

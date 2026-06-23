@@ -103,7 +103,7 @@
             <!-- Right Side: Hero Image -->
             <div class="lg:col-span-5 relative">
                 <div class="absolute inset-0 bg-amber-100/40 rounded-[2.5rem] blur-2xl transform rotate-3 -z-10 scale-95 pointer-events-none"></div>
-                <img src="{{ asset('images/dasawisma_hero.jpeg') }}" alt="Aplikasi Dasawisma" class="w-full max-w-lg mx-auto rounded-[2rem] shadow-2xl border-8 border-white transform hover:scale-[1.01] transition duration-500 ease-out">
+                <img src="{{ asset('images/dasawisma_hero.jpg') }}" alt="Aplikasi Dasawisma" class="w-full max-w-lg mx-auto rounded-[2rem] shadow-2xl border-8 border-white transform hover:scale-[1.01] transition duration-500 ease-out">
             </div>
         </section>
 

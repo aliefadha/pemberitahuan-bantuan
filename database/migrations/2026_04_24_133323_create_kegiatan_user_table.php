@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('kegiatan_id')->constrained('kegiatans')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['bersedia', 'tidak_bersedia']);
+            $table->text('alasan')->nullable();
             $table->timestamps();
         });
     }
