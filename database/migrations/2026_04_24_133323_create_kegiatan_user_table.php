@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('kegiatan_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kegiatan_id')->constrained('kegiatans')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->enum('status', ['bersedia', 'tidak_bersedia']);
             $table->text('alasan')->nullable();
             $table->timestamps();

@@ -14,7 +14,8 @@ return new class extends Migration
 
         Schema::create('anggota_keluarga', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama');
             $table->enum('status_dalam_keluarga', ['suami', 'istri', 'anak']);
             $table->enum('status_perkawinan', ['menikah', 'belum_menikah', 'cerai']);
