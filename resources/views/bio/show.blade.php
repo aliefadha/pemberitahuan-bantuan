@@ -14,7 +14,12 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
             <div class="px-8 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800">{{ $user->name }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        {{ $user->name }}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-gray-100 text-gray-600 border border-gray-200 select-all">
+                            {{ $user->id }}
+                        </span>
+                    </h3>
                     <p class="text-sm text-gray-500 mt-0.5">{{ $user->email }}</p>
                     @if($user->alamat || $user->jorong || $user->kelompok)
                         <p class="text-sm text-gray-500 mt-0.5">

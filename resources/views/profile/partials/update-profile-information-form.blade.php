@@ -3,6 +3,12 @@
     @method('patch')
 
     <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+        <input type="text" class="w-full rounded-lg border border-gray-200 bg-gray-50 shadow-sm py-1.5 px-2 text-gray-500 font-mono select-all cursor-not-allowed" value="{{ $user->id }}" readonly>
+        <p class="mt-1 text-xs text-gray-400">ID unik Anda untuk verifikasi bantuan.</p>
+    </div>
+
+    <div>
         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
         <input type="text" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('name') border-red-500 @enderror" id="name" name="name" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
         @error('name')

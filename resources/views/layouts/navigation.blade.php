@@ -34,6 +34,9 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <div class="px-4 py-2 border-b border-gray-100 bg-gray-50 text-xxs font-mono text-gray-400 select-all">
+                            ID: {{ Auth::user()->id }}
+                        </div>
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
@@ -77,6 +80,7 @@
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-mono text-xs text-gray-400 mt-0.5 select-all">ID: {{ Auth::user()->id }}</div>
             </div>
 
             <div class="mt-3 space-y-1">

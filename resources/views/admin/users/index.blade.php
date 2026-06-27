@@ -32,6 +32,7 @@
                 <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-semibold">
                     <tr>
                         <th class="px-6 py-3">No</th>
+                        <th class="px-6 py-3">User ID</th>
                         <th class="px-6 py-3">Nama</th>
                         <th class="px-6 py-3">Email</th>
                         <th class="px-6 py-3">No. HP</th>
@@ -45,6 +46,7 @@
                     @foreach($users as $user)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4">{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}</td>
+                        <td class="px-6 py-4 font-mono text-xs text-gray-600 select-all">{{ $user->id }}</td>
                         <td class="px-6 py-4 font-medium text-gray-900">{{ $user->name }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $user->email }}</td>
                         <td class="px-6 py-4">
