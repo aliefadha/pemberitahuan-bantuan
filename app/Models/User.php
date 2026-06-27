@@ -32,8 +32,10 @@ class User extends Authenticatable
     /**
      * Bootstrap the model and its traits.
      */
-    protected static function booted(): void
+    protected static function boot(): void
     {
+        parent::boot();
+
         static::creating(function (User $user) {
             if (empty($user->id)) {
                 $user->id = 'USER-' . strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6));
