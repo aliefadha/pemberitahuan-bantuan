@@ -34,11 +34,12 @@ class KegiatanNotification extends Notification
     public function toWhatsApp(object $notifiable): array
     {
         $jorongStr = $this->kegiatan->jorong_label ? "\nJorong: {$this->kegiatan->jorong_label}" : '';
+        $url = route('kegiatan.show', $this->kegiatan);
         $message = match ($this->type) {
-            'created' => "📢 *Kegiatan Baru*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nDeskripsi: {$this->kegiatan->deskripsi}\n\nCek kegiatan pada sistem.",
-            'updated' => "📝 *Kegiatan Diupdate*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nCek kegiatan pada sistem.",
+            'created' => "📢 *Kegiatan Baru*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nDeskripsi: {$this->kegiatan->deskripsi}\n\nCek kegiatan pada sistem:\n{$url}",
+            'updated' => "📝 *Kegiatan Diupdate*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nCek kegiatan pada sistem:\n{$url}",
             'deleted' => "🗑️ *Kegiatan Dihapus*\n\nKegiatan '{$this->kegiatan->judul}' telah dibatalkan.",
-            default => "Ada perubahan pada kegiatan: {$this->kegiatan->judul}",
+            default => "Ada perubahan pada kegiatan: {$this->kegiatan->judul}\n\nCek kegiatan pada sistem:\n{$url}",
         };
 
         return [
