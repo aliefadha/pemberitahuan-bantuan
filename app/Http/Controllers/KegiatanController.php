@@ -27,6 +27,7 @@ class KegiatanController extends Controller
     {
         $userResponse = $kegiatan->users()->where('user_id', auth()->id())->first();
         $status = $userResponse ? $userResponse->pivot->status : null;
+        $alasan = $userResponse ? $userResponse->pivot->alasan : null;
 
         $userJorong = auth()->user()->jorong;
         $kelompoks = Kelompok::where('jorong', $userJorong)
@@ -41,22 +42,29 @@ class KegiatanController extends Controller
             ->pluck('status', 'user_id')
             ->toArray();
 
-        return view('kegiatan.show', compact('kegiatan', 'status', 'kelompoks', 'responses'));
+        return view('kegiatan.show', compact('kegiatan', 'status', 'alasan', 'kelompoks', 'responses'));
     }
 
     public function respond(Request $request, Kegiatan $kegiatan)
     {
         $request->validate([
             'status' => 'required|in:bersedia,tidak_bersedia',
+            'alasan' => 'required_if:status,tidak_bersedia|nullable|string',
         ]);
 
+        $status = $request->status;
+        $alasan = $status === 'tidak_bersedia' ? $request->alasan : null;
+
         $kegiatan->users()->syncWithoutDetaching([
-            auth()->id() => ['status' => $request->status],
+            auth()->id() => [
+                'status' => $status,
+                'alasan' => $alasan,
+            ],
         ]);
 
         $admins = \App\Models\User::whereIn('role', ['admin', 'kader'])->get();
         foreach ($admins as $admin) {
-            $admin->notify(new \App\Notifications\KegiatanResponseNotification($kegiatan, auth()->user(), $request->status));
+            $admin->notify(new \App\Notifications\KegiatanResponseNotification($kegiatan, auth()->user(), $status, $alasan));
         }
 
         return redirect()->route('kegiatan.show', $kegiatan)->with('success', 'Tanggapan Anda telah disimpan.');

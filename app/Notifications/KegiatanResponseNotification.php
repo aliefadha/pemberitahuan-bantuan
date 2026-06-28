@@ -14,12 +14,14 @@ class KegiatanResponseNotification extends Notification
     protected Kegiatan $kegiatan;
     protected User $peserta;
     protected string $status;
+    protected ?string $alasan;
 
-    public function __construct(Kegiatan $kegiatan, User $peserta, string $status)
+    public function __construct(Kegiatan $kegiatan, User $peserta, string $status, ?string $alasan = null)
     {
         $this->kegiatan = $kegiatan;
         $this->peserta = $peserta;
         $this->status = $status;
+        $this->alasan = $alasan;
     }
 
     public function via(object $notifiable): array
@@ -31,11 +33,15 @@ class KegiatanResponseNotification extends Notification
     {
         $statusText = $this->status === 'bersedia' ? 'Bersedia' : 'Tidak Bersedia';
         $message = "{$this->peserta->name} telah menanggapi kegiatan '{$this->kegiatan->judul}' dengan status: {$statusText}";
+        if ($this->status === 'tidak_bersedia' && $this->alasan) {
+            $message .= " (Alasan: {$this->alasan})";
+        }
 
         return [
             'kegiatan_id' => $this->kegiatan->id,
             'peserta_id' => $this->peserta->id,
             'status' => $this->status,
+            'alasan' => $this->alasan,
             'message' => $message,
         ];
     }

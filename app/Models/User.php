@@ -116,7 +116,7 @@ class User extends Authenticatable
 
     public function kegiatans()
     {
-        return $this->belongsToMany(Kegiatan::class)->withPivot('status')->withTimestamps();
+        return $this->belongsToMany(Kegiatan::class)->withPivot('status', 'alasan')->withTimestamps();
     }
 
     public function getWhatsAppNumberAttribute(): ?string

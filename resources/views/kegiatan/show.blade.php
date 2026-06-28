@@ -72,6 +72,11 @@
                                 </svg>
                                 Tidak Bersedia
                             </span>
+                            @if($alasan)
+                                <div class="mt-2 text-sm text-gray-600 italic bg-gray-50 border border-gray-200 rounded-lg p-2.5 max-w-md">
+                                    <strong>Alasan:</strong> {{ $alasan }}
+                                </div>
+                            @endif
                         @endif
                     </div>
                     <p class="text-sm text-gray-500 mb-4">Anda dapat mengubah status kehadiran Anda menggunakan tombol di bawah ini:</p>
@@ -119,7 +124,7 @@
                                 required
                                 placeholder="Tuliskan alasan Anda tidak bersedia hadir..."
                                 class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 placeholder-gray-400 shadow-sm focus:border-red-400 focus:ring-2 focus:ring-red-100 transition @error('alasan') border-red-500 @enderror"
-                            >{{ old('alasan') }}</textarea>
+                            >{{ old('alasan', $alasan) }}</textarea>
                             @error('alasan')
                                 <p class="text-xs text-red-600">{{ $message }}</p>
                             @enderror

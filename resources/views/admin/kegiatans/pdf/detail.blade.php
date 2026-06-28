@@ -386,6 +386,9 @@
                                     <span class="status-bersedia">&#10003; Bersedia</span>
                                 @elseif($status === 'tidak_bersedia')
                                     <span class="status-tidak">&#10007; Tidak Bersedia</span>
+                                    @if(isset($response->alasan) && $response->alasan)
+                                        <br/><span style="font-size: 8pt; font-style: italic; color: #555; font-weight: normal; display: block; margin-top: 2px;">Alasan: {{ $response->alasan }}</span>
+                                    @endif
                                 @else
                                     <span style="color: #666; font-style: italic;">Belum Merespons</span>
                                 @endif

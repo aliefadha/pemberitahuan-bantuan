@@ -20,7 +20,7 @@ class Kegiatan extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('status')->withTimestamps();
+        return $this->belongsToMany(User::class)->withPivot('status', 'alasan')->withTimestamps();
     }
 
     /**

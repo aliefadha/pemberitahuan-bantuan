@@ -202,7 +202,7 @@ class KegiatanController extends Controller
         // Get response statuses mapped by user_id
         $responses = DB::table('kegiatan_user')
             ->where('kegiatan_id', $kegiatan->id)
-            ->get(['user_id', 'status', 'updated_at'])
+            ->get(['user_id', 'status', 'alasan', 'updated_at'])
             ->keyBy('user_id')
             ->toArray();
 
