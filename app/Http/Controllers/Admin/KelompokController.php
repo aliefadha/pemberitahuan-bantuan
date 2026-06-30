@@ -44,8 +44,10 @@ class KelompokController extends Controller
         }
 
         $request->validate([
-            'name'   => ['required', 'string', 'max:255'],
+            'name'   => ['required', 'string', 'max:255', 'unique:kelompoks,name'],
             'jorong' => $jorongRules,
+        ], [
+            'name.unique' => 'Nama kelompok sudah digunakan.',
         ]);
 
         Kelompok::create([
@@ -93,8 +95,10 @@ class KelompokController extends Controller
         }
 
         $request->validate([
-            'name'   => ['required', 'string', 'max:255'],
+            'name'   => ['required', 'string', 'max:255', 'unique:kelompoks,name,' . $kelompok->id],
             'jorong' => $jorongRules,
+        ], [
+            'name.unique' => 'Nama kelompok sudah digunakan.',
         ]);
 
         DB::transaction(function () use ($request, $kelompok) {
