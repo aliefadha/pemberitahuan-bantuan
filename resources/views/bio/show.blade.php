@@ -39,7 +39,7 @@
                         </p>
                     @endif
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-6">
                     @php
                         $totalFields = collect($sections)->sum(fn($s) => count($s['questions']));
                         $filledFields = collect($sections)->sum(function($s) use ($bioData) {
@@ -61,6 +61,14 @@
                             </span>
                         </div>
                     </div>
+                    @if(auth()->user()->role === 'peserta')
+                        <a href="{{ route('bio.edit') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                            Edit Profil
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -75,14 +83,25 @@
         @endif
 
         @if(empty($bioData))
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 flex items-start gap-4">
-                <svg class="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <div>
-                    <p class="font-semibold text-blue-800">Data Bio Belum Diisi</p>
-                    <p class="text-sm text-blue-700 mt-1">Data biodata Anda belum diisi. Harap hubungi Kader atau Admin jorong Anda untuk melengkapi data bio Anda.</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col md:flex-row items-start justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <svg class="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <p class="font-semibold text-blue-800">Data Bio Belum Diisi</p>
+                        @if(auth()->user()->role === 'peserta')
+                            <p class="text-sm text-blue-700 mt-1">Data biodata Anda belum diisi. Silakan lengkapi data bio Anda dengan menekan tombol di samping.</p>
+                        @else
+                            <p class="text-sm text-blue-700 mt-1">Data biodata Anda belum diisi. Harap hubungi Kader atau Admin jorong Anda untuk melengkapi data bio Anda.</p>
+                        @endif
+                    </div>
                 </div>
+                @if(auth()->user()->role === 'peserta')
+                    <a href="{{ route('bio.edit') }}" class="w-full md:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow-sm whitespace-nowrap">
+                        Lengkapi Bio
+                    </a>
+                @endif
             </div>
         @else
             <div class="space-y-4">

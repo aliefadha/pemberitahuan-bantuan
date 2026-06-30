@@ -22,7 +22,7 @@ class BioController extends Controller
 
     public function edit(): View
     {
-        if (auth()->user()->role === 'peserta') {
+        if (auth()->user()->role !== 'peserta') {
             abort(403, 'Unauthorized action.');
         }
         $sections = config('bio.sections');
@@ -39,7 +39,7 @@ class BioController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
-        if (auth()->user()->role === 'peserta') {
+        if (auth()->user()->role !== 'peserta') {
             abort(403, 'Unauthorized action.');
         }
         $sections = config('bio.sections');

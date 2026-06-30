@@ -101,7 +101,7 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('bio.show') }}"
+                        <a href="{{ route('bio.edit') }}"
                            class="flex items-center gap-3 pl-3 pr-4 py-2.5 transition-all {{ request()->routeIs('bio.*') ? 'bg-amber-500/10 text-amber-400 border-l-4 border-amber-500 font-medium' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent' }}">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>

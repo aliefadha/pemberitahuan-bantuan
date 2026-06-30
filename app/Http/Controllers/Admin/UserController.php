@@ -75,8 +75,10 @@ class UserController extends Controller
                 'jorong'     => $request->jorong,
             ]);
 
-            foreach ($request->input('anggota_keluarga', []) as $anggota) {
-                $user->anggotaKeluarga()->create($anggota);
+            if (auth()->user()->role === 'admin') {
+                foreach ($request->input('anggota_keluarga', []) as $anggota) {
+                    $user->anggotaKeluarga()->create($anggota);
+                }
             }
         });
 
@@ -152,29 +154,31 @@ class UserController extends Controller
                 $user->update(['password' => Hash::make($request->password)]);
             }
 
-            if ($request->has('bio_data')) {
-                $sections = config('bio.sections');
-                $rules    = [];
+            if (auth()->user()->role === 'admin') {
+                if ($request->has('bio_data')) {
+                    $sections = config('bio.sections');
+                    $rules    = [];
 
-                foreach ($sections as $section) {
-                    foreach ($section['questions'] as $q) {
-                        $key = $q['key'];
-                        if ($q['type'] === 'integer') {
-                            $rules["bio_data.{$key}"] = ['nullable', 'integer'];
-                        } elseif ($q['type'] === 'boolean') {
-                            $rules["bio_data.{$key}"] = ['nullable', 'integer', 'in:0,1'];
+                    foreach ($sections as $section) {
+                        foreach ($section['questions'] as $q) {
+                            $key = $q['key'];
+                            if ($q['type'] === 'integer') {
+                                $rules["bio_data.{$key}"] = ['nullable', 'integer'];
+                            } elseif ($q['type'] === 'boolean') {
+                                $rules["bio_data.{$key}"] = ['nullable', 'integer', 'in:0,1'];
+                            }
                         }
                     }
+
+                    $validatedBio = $request->validate($rules);
+                    $user->update(['bio_data' => $validatedBio['bio_data'] ?? []]);
                 }
 
-                $validatedBio = $request->validate($rules);
-                $user->update(['bio_data' => $validatedBio['bio_data'] ?? []]);
-            }
-
-            // Sync anggota keluarga: replace all with submitted data
-            $user->anggotaKeluarga()->delete();
-            foreach ($request->input('anggota_keluarga', []) as $anggota) {
-                $user->anggotaKeluarga()->create($anggota);
+                // Sync anggota keluarga: replace all with submitted data
+                $user->anggotaKeluarga()->delete();
+                foreach ($request->input('anggota_keluarga', []) as $anggota) {
+                    $user->anggotaKeluarga()->create($anggota);
+                }
             }
         });
 

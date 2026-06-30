@@ -115,6 +115,7 @@
                         </div>
                     </div>
 
+                    @if(auth()->user()->role === 'admin')
                     <div id="bio-data-container" class="border-t border-gray-200 pt-6 mt-6">
                         <h4 class="text-base font-semibold text-gray-800 mb-4">Data Bio Peserta</h4>
                         <div class="space-y-6">
@@ -296,6 +297,7 @@
                         updateHint();
                     })();
                     </script>
+                    @endif
 
                     <script>
                     document.addEventListener('DOMContentLoaded', function () {
