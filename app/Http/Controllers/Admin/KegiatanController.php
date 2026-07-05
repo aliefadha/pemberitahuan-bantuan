@@ -13,13 +13,21 @@ use Illuminate\Support\Facades\DB;
 
 class KegiatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $query = Kegiatan::latest();
         if (auth()->user()->isKader()) {
             $query->where('jorong', auth()->user()->jorong);
         }
-        $kegiatans = $query->paginate(10);
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                  ->orWhere('deskripsi', 'like', "%{$search}%");
+            });
+        }
+
+        $kegiatans = $query->paginate(10)->appends($request->only('search'));
 
         return view('admin.kegiatans.index', compact('kegiatans'));
     }

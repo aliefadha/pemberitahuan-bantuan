@@ -12,13 +12,18 @@ use Illuminate\Support\Facades\DB;
 
 class KelompokController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $query = Kelompok::withCount('users');
         if (auth()->user()->isKader()) {
             $query->where('jorong', auth()->user()->jorong);
         }
-        $kelompoks = $query->paginate(10);
+
+        if ($search = $request->input('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $kelompoks = $query->paginate(10)->appends($request->only('search'));
 
         return view('admin.kelompoks.index', compact('kelompoks'));
     }

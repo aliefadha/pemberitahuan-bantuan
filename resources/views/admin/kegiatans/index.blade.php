@@ -19,8 +19,30 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 flex flex-row items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-800">Daftar Kegiatan</h3>
+            <h3 class="text-lg font-semibold text-gray-800 shrink-0">Daftar Kegiatan</h3>
             <div class="flex items-center gap-2">
+                <form method="GET" action="{{ route('admin.kegiatans.index') }}" class="flex items-center gap-2">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            name="search"
+                            id="kegiatan-search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari judul atau deskripsi..."
+                            class="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent w-64"
+                        />
+                    </div>
+                    @if(request('search'))
+                        <a href="{{ route('admin.kegiatans.index') }}" class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                            Reset
+                        </a>
+                    @endif
+                </form>
                 <a href="{{ route('admin.kegiatans.exportPdf') }}" class="inline-flex items-center gap-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition" title="Export semua kegiatan ke PDF">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>

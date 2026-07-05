@@ -14,7 +14,7 @@ use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $query = User::latest();
 
@@ -22,7 +22,15 @@ class UserController extends Controller
             $query->where('jorong', auth()->user()->jorong);
         }
 
-        $users = $query->paginate(10);
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('no_telepon', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate(10)->appends($request->only('search'));
 
         return view('admin.users.index', compact('users'));
     }
