@@ -144,7 +144,18 @@ class UserController extends Controller
             'anggota_keluarga.*.tanggal_lahir'         => ['nullable', 'date'],
             'anggota_keluarga.*.pekerjaan'             => ['nullable', 'string', 'max:255'],
             'anggota_keluarga.*.status'                => ['nullable', 'in:meninggal,hamil'],
-            'kelompok_id'                              => ['nullable', 'exists:kelompoks,id'],
+            'kelompok_id'                              => [
+                'nullable',
+                'exists:kelompoks,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value && $request->role !== 'admin') {
+                        $kelompok = Kelompok::find($value);
+                        if ($kelompok && $kelompok->jorong !== $request->jorong) {
+                            $fail('Kelompok yang dipilih harus berada di jorong yang sama dengan user.');
+                        }
+                    }
+                }
+            ],
             'jorong'                                   => $jorongRules,
         ]);
 

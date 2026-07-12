@@ -63,6 +63,19 @@ class KelompokController extends Controller
         return redirect()->route('admin.kelompoks.index')->with('success', 'Kelompok berhasil dibuat.');
     }
 
+    public function show(Kelompok $kelompok)
+    {
+        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $kelompok->load(['users' => function($query) {
+            $query->orderBy('name');
+        }]);
+
+        return view('admin.kelompoks.show', compact('kelompok'));
+    }
+
     public function edit(Kelompok $kelompok)
     {
         if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {

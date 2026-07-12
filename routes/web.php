@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/kelompoks/create', [KelompokController::class, 'create'])->name('kelompoks.create');
             Route::post('/kelompoks', [KelompokController::class, 'store'])->name('kelompoks.store');
             Route::get('/kelompoks/export-pdf', [KelompokController::class, 'exportPdf'])->name('kelompoks.exportPdf');
+            Route::get('/kelompoks/{kelompok}', [KelompokController::class, 'show'])->name('kelompoks.show');
             Route::get('/kelompoks/{kelompok}/export-pdf', [KelompokController::class, 'exportPdfDetail'])->name('kelompoks.exportPdfDetail');
             Route::get('/kelompoks/{kelompok}/edit', [KelompokController::class, 'edit'])->name('kelompoks.edit');
             Route::put('/kelompoks/{kelompok}', [KelompokController::class, 'update'])->name('kelompoks.update');

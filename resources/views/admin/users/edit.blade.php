@@ -81,7 +81,7 @@
                         <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('kelompok_id') border-red-500 @enderror" id="kelompok_id" name="kelompok_id">
                             <option value="">-- Tidak ada --</option>
                             @foreach($kelompoks as $k)
-                                <option value="{{ $k->id }}" {{ old('kelompok_id', $user->kelompok_id) == $k->id ? 'selected' : '' }}>
+                                <option value="{{ $k->id }}" data-jorong="{{ $k->jorong }}" {{ old('kelompok_id', $user->kelompok_id) == $k->id ? 'selected' : '' }}>
                                     {{ $k->name }}{{ $k->jorong ? ' — ' . $k->jorong_label : '' }}
                                 </option>
                             @endforeach
@@ -306,6 +306,71 @@
                         var jorongSelect = document.getElementById('jorong');
                         var anggotaKeluargaContainer = document.getElementById('anggota-keluarga-container');
                         var bioDataContainer = document.getElementById('bio-data-container');
+                        var kelompokSelect = document.getElementById('kelompok_id');
+
+                        // Clone all of the original options to restore them when jorong changes
+                        var kelompokOptions = [];
+                        if (kelompokSelect) {
+                            for (var i = 0; i < kelompokSelect.options.length; i++) {
+                                var opt = kelompokSelect.options[i];
+                                kelompokOptions.push({
+                                    value: opt.value,
+                                    text: opt.textContent,
+                                    jorong: opt.getAttribute('data-jorong') || ''
+                                });
+                            }
+                        }
+
+                        var initialKelompokId = kelompokSelect ? kelompokSelect.value : '';
+
+                        function updateKelompokOptions() {
+                            if (!kelompokSelect) return;
+
+                            var jorongVal = '';
+                            if (jorongSelect) {
+                                jorongVal = jorongSelect.value;
+                            }
+
+                            var currentSelectedVal = kelompokSelect.value || initialKelompokId;
+
+                            // Clear all options
+                            kelompokSelect.innerHTML = '';
+
+                            // Add placeholder option ("-- Tidak ada --")
+                            var noneOpt = document.createElement('option');
+                            noneOpt.value = '';
+                            noneOpt.textContent = '-- Tidak ada --';
+                            kelompokSelect.appendChild(noneOpt);
+
+                            if (jorongVal === '') {
+                                // Disable kelompok select if no jorong is chosen
+                                kelompokSelect.disabled = true;
+                                kelompokSelect.value = '';
+                            } else {
+                                // Enable kelompok select
+                                kelompokSelect.disabled = false;
+                                var restoredSelectedVal = '';
+
+                                // Filter and append kelompok options that belong to the selected jorong
+                                kelompokOptions.forEach(function (optData) {
+                                    if (optData.value !== '' && optData.jorong === jorongVal) {
+                                        var newOpt = document.createElement('option');
+                                        newOpt.value = optData.value;
+                                        newOpt.textContent = optData.text;
+                                        newOpt.setAttribute('data-jorong', optData.jorong);
+                                        
+                                        if (optData.value === currentSelectedVal) {
+                                            newOpt.selected = true;
+                                            restoredSelectedVal = optData.value;
+                                        }
+                                        kelompokSelect.appendChild(newOpt);
+                                    }
+                                });
+
+                                // Set value to either restored value or empty
+                                kelompokSelect.value = restoredSelectedVal;
+                            }
+                        }
 
                         function handleRoleChange() {
                             var selectedRole = roleSelect ? roleSelect.value : 'peserta';
@@ -334,6 +399,9 @@
                                 }
                                 if (jorongSelect) {
                                     jorongSelect.removeAttribute('required');
+                                    if (jorongSelect.tagName === 'SELECT') {
+                                        jorongSelect.value = '';
+                                    }
                                 }
                             } else {
                                 if (jorongContainer) {
@@ -343,11 +411,19 @@
                                     jorongSelect.setAttribute('required', 'required');
                                 }
                             }
+
+                            // Update kelompok selection options on role change
+                            updateKelompokOptions();
                         }
 
                         if (roleSelect && roleSelect.tagName === 'SELECT') {
                             roleSelect.addEventListener('change', handleRoleChange);
                         }
+
+                        if (jorongSelect && jorongSelect.tagName === 'SELECT') {
+                            jorongSelect.addEventListener('change', updateKelompokOptions);
+                        }
+
                         handleRoleChange(); // Run on initial load
                     });
                     </script>
