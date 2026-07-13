@@ -92,12 +92,12 @@
 
     <script>
     (function () {
-        var jorongSel = document.getElementById('jorong');
+        var jorongSel = document.getElementById('jorong') || document.getElementsByName('jorong')[0];
         var userRows  = document.querySelectorAll('.user-row');
         var notice    = document.getElementById('no-users-notice');
 
         function filterUsers() {
-            var selectedJorong = jorongSel.value;
+            var selectedJorong = jorongSel ? jorongSel.value : '';
             var visibleCount = 0;
 
             userRows.forEach(function (row) {

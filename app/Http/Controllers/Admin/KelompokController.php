@@ -84,7 +84,11 @@ class KelompokController extends Controller
 
         $kelompok->load('users');
         
-        $allUsersQuery = User::orderBy('name');
+        $allUsersQuery = User::orderBy('name')
+            ->where(function ($query) use ($kelompok) {
+                $query->whereNull('kelompok_id')
+                      ->orWhere('kelompok_id', $kelompok->id);
+            });
         if (auth()->user()->isKader()) {
             $allUsersQuery->where('jorong', auth()->user()->jorong);
         }
