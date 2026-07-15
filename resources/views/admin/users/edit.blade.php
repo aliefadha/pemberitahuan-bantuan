@@ -31,8 +31,9 @@
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <input type="email" class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('email') border-red-500 @enderror" id="email" name="email" value="{{ old('email', $user->email) }}" required>
                         @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p id="server-email-error" class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                        <p id="client-email-error" class="mt-1 text-sm text-red-600 hidden"></p>
                     </div>
 
                     <div>
@@ -425,6 +426,68 @@
                         }
 
                         handleRoleChange(); // Run on initial load
+
+                        // Email Real-time Client-side Validation
+                        var emailInput = document.getElementById('email');
+                        var clientEmailError = document.getElementById('client-email-error');
+                        var serverEmailError = document.getElementById('server-email-error');
+                        var hasInteracted = false;
+
+                        function validateEmail() {
+                            var emailVal = emailInput.value.trim();
+                            var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+                            if (serverEmailError) {
+                                serverEmailError.style.display = 'none';
+                            }
+
+                            if (emailVal === '') {
+                                emailInput.classList.remove('border-gray-300', 'border-green-500');
+                                emailInput.classList.add('border-red-500');
+                                clientEmailError.textContent = 'Email wajib diisi.';
+                                clientEmailError.classList.remove('hidden');
+                                return false;
+                            } else if (!emailRegex.test(emailVal)) {
+                                emailInput.classList.remove('border-gray-300', 'border-green-500');
+                                emailInput.classList.add('border-red-500');
+                                clientEmailError.textContent = 'Format email tidak valid (contoh: nama@gmail.com).';
+                                clientEmailError.classList.remove('hidden');
+                                return false;
+                            } else {
+                                emailInput.classList.remove('border-gray-300', 'border-red-500');
+                                emailInput.classList.add('border-green-500');
+                                clientEmailError.classList.add('hidden');
+                                return true;
+                            }
+                        }
+
+                        if (emailInput) {
+                            emailInput.addEventListener('blur', function () {
+                                hasInteracted = true;
+                                validateEmail();
+                            });
+
+                            emailInput.addEventListener('input', function () {
+                                if (hasInteracted) {
+                                    validateEmail();
+                                } else {
+                                    if (serverEmailError) {
+                                        serverEmailError.style.display = 'none';
+                                    }
+                                }
+                            });
+
+                            var form = emailInput.closest('form');
+                            if (form) {
+                                form.addEventListener('submit', function (e) {
+                                    hasInteracted = true;
+                                    if (!validateEmail()) {
+                                        e.preventDefault();
+                                        emailInput.focus();
+                                    }
+                                });
+                            }
+                        }
                     });
                     </script>
 

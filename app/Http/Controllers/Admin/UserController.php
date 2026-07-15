@@ -71,6 +71,10 @@ class UserController extends Controller
             'anggota_keluarga.*.tanggal_lahir'         => ['nullable', 'date'],
             'anggota_keluarga.*.pekerjaan'             => ['nullable', 'string', 'max:255'],
             'anggota_keluarga.*.status'                => ['nullable', 'in:meninggal,hamil'],
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+            'email.unique'   => 'Email sudah terdaftar.',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -157,6 +161,10 @@ class UserController extends Controller
                 }
             ],
             'jorong'                                   => $jorongRules,
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+            'email.unique'   => 'Email sudah terdaftar.',
         ]);
 
         DB::transaction(function () use ($request, $user) {
