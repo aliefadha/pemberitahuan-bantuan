@@ -435,7 +435,7 @@
 
                         function validateEmail() {
                             var emailVal = emailInput.value.trim();
-                            var emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                            var emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
                             if (serverEmailError) {
                                 serverEmailError.style.display = 'none';
@@ -450,7 +450,7 @@
                             } else if (!emailRegex.test(emailVal)) {
                                 emailInput.classList.remove('border-gray-300', 'border-green-500');
                                 emailInput.classList.add('border-red-500');
-                                clientEmailError.textContent = 'Format email tidak valid (contoh: nama@gmail.com).';
+                                clientEmailError.textContent = 'format harus @gmail.com (contoh: nama@gmail.com).';
                                 clientEmailError.classList.remove('hidden');
                                 return false;
                             } else {

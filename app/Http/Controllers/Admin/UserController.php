@@ -58,7 +58,7 @@ class UserController extends Controller
 
         $request->validate([
             'name'       => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email'      => ['required', 'string', 'email', 'ends_with:@gmail.com', 'max:255', 'unique:users'],
             'role'       => ['required', Rule::in($rolesAllowed)],
             'no_telepon' => ['required', 'string', 'max:20', 'unique:users'],
             'jorong'     => $jorongRules,
@@ -72,9 +72,10 @@ class UserController extends Controller
             'anggota_keluarga.*.pekerjaan'             => ['nullable', 'string', 'max:255'],
             'anggota_keluarga.*.status'                => ['nullable', 'in:meninggal,hamil'],
         ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email'    => 'Format email tidak valid.',
-            'email.unique'   => 'Email sudah terdaftar.',
+            'email.required'  => 'Email wajib diisi.',
+            'email.email'     => 'Format email tidak valid.',
+            'email.ends_with' => 'format harus @gmail.com.',
+            'email.unique'    => 'Email sudah terdaftar.',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -136,7 +137,7 @@ class UserController extends Controller
 
         $request->validate([
             'name'       => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'email'      => ['required', 'string', 'email', 'ends_with:@gmail.com', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'role'       => ['required', Rule::in($rolesAllowed)],
             'no_telepon' => ['nullable', 'string', 'max:20', Rule::unique('users', 'no_telepon')->ignore($user->id)],
             'password'   => ['nullable', 'confirmed', Rules\Password::defaults()],
@@ -162,9 +163,10 @@ class UserController extends Controller
             ],
             'jorong'                                   => $jorongRules,
         ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email'    => 'Format email tidak valid.',
-            'email.unique'   => 'Email sudah terdaftar.',
+            'email.required'  => 'Email wajib diisi.',
+            'email.email'     => 'Format email tidak valid.',
+            'email.ends_with' => 'format harus @gmail.com.',
+            'email.unique'    => 'Email sudah terdaftar.',
         ]);
 
         DB::transaction(function () use ($request, $user) {
