@@ -29,12 +29,15 @@ npm install
 cp .env.example .env
 ```
 
-4. **Generate application key**
+4. **Generate application key and WhatsApp webhook secret**
 ```bash
 php artisan key:generate
 ```
 
-5. **Configure database** di `.env`:
+Set `WHATSAPP_WEBHOOK_SECRET` di `.env` ke nilai acak yang kuat. Laravel dan
+WhatsApp service membaca nilai yang sama dari file ini.
+
+5. **Configure database and service URLs** di `.env`:
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -42,6 +45,10 @@ DB_PORT=3306
 DB_DATABASE=pemberitahuan_dosen
 DB_USERNAME=root
 DB_PASSWORD=
+
+WHATSAPP_SERVICE_URL=http://localhost:3001
+LARAVEL_APP_URL=http://localhost:8000
+WHATSAPP_WEBHOOK_SECRET=ganti-dengan-secret-acak
 ```
 
 6. **Run migrations**
@@ -70,8 +77,10 @@ php artisan serve
 ```bash
 cd whatsapp-service
 npm install
-node index.js
+npm start
 ```
+
+Perintah `npm start` memuat konfigurasi dari file `.env` di root project.
 
 3. **Buka browser**
 ```

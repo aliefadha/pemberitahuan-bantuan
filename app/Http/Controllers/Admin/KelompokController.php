@@ -16,7 +16,7 @@ class KelompokController extends Controller
     {
         $query = Kelompok::withCount('users');
         if (auth()->user()->isKader()) {
-            $query->where('jorong', auth()->user()->jorong);
+            $query->whereKey(auth()->user()->kelompok_id);
         }
 
         if ($search = $request->input('search')) {
@@ -30,11 +30,13 @@ class KelompokController extends Controller
 
     public function create()
     {
+        abort_if(auth()->user()->isKader(), 403, 'Kader tidak dapat membuat kelompok.');
         return view('admin.kelompoks.create');
     }
 
     public function store(Request $request)
     {
+        abort_if(auth()->user()->isKader(), 403, 'Kader tidak dapat membuat kelompok.');
         if (auth()->user()->isKader()) {
             $request->merge(['jorong' => auth()->user()->jorong]);
         }
@@ -65,7 +67,7 @@ class KelompokController extends Controller
 
     public function show(Kelompok $kelompok)
     {
-        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+        if (auth()->user()->isKader() && $kelompok->id !== auth()->user()->kelompok_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -78,7 +80,7 @@ class KelompokController extends Controller
 
     public function edit(Kelompok $kelompok)
     {
-        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+        if (auth()->user()->isKader() && $kelompok->id !== auth()->user()->kelompok_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -90,7 +92,8 @@ class KelompokController extends Controller
                       ->orWhere('kelompok_id', $kelompok->id);
             });
         if (auth()->user()->isKader()) {
-            $allUsersQuery->where('jorong', auth()->user()->jorong);
+            $allUsersQuery->where('jorong', auth()->user()->jorong)
+                ->where('role', 'peserta');
         }
         $allUsers = $allUsersQuery->get(['id', 'name', 'kelompok_id', 'role', 'jorong']);
 
@@ -99,7 +102,7 @@ class KelompokController extends Controller
 
     public function update(Request $request, Kelompok $kelompok)
     {
-        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+        if (auth()->user()->isKader() && $kelompok->id !== auth()->user()->kelompok_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -133,7 +136,12 @@ class KelompokController extends Controller
 
             if (auth()->user()->isKader() && !empty($submittedUserIds)) {
                 $count = User::whereIn('id', $submittedUserIds)
-                    ->where('jorong', '!=', auth()->user()->jorong)
+                    ->where(function ($query) use ($kelompok) {
+                        $query->where('jorong', '!=', $kelompok->jorong)
+                            ->orWhere('role', '!=', 'peserta')
+                            ->orWhereNotNull('kelompok_id')
+                            ->where('kelompok_id', '!=', $kelompok->id);
+                    })
                     ->count();
                 if ($count > 0) {
                     abort(403, 'Anda hanya dapat memasukkan user dari jorong Anda sendiri.');
@@ -141,14 +149,20 @@ class KelompokController extends Controller
             }
 
             // Users currently in this kelompok but NOT in submitted list → nullify
-            User::where('kelompok_id', $kelompok->id)
-                ->whereNotIn('id', $submittedUserIds)
-                ->update(['kelompok_id' => null]);
+            $usersInKelompok = User::where('kelompok_id', $kelompok->id)
+                ->whereNotIn('id', $submittedUserIds);
+            if (auth()->user()->isKader()) {
+                $usersInKelompok->where('role', 'peserta');
+            }
+            $usersInKelompok->update(['kelompok_id' => null]);
 
             // Users in submitted list → assign to this kelompok
             if (!empty($submittedUserIds)) {
-                User::whereIn('id', $submittedUserIds)
-                    ->update(['kelompok_id' => $kelompok->id]);
+                $usersToAssign = User::whereIn('id', $submittedUserIds);
+                if (auth()->user()->isKader()) {
+                    $usersToAssign->where('role', 'peserta');
+                }
+                $usersToAssign->update(['kelompok_id' => $kelompok->id]);
             }
         });
 
@@ -157,7 +171,7 @@ class KelompokController extends Controller
 
     public function destroy(Kelompok $kelompok)
     {
-        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+        if (auth()->user()->isKader() && $kelompok->id !== auth()->user()->kelompok_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -175,7 +189,7 @@ class KelompokController extends Controller
     {
         $query = Kelompok::withCount('users');
         if (auth()->user()->isKader()) {
-            $query->where('jorong', auth()->user()->jorong);
+            $query->whereKey(auth()->user()->kelompok_id);
         }
         $kelompoks = $query->get();
 
@@ -189,7 +203,7 @@ class KelompokController extends Controller
 
     public function exportPdfDetail(Kelompok $kelompok)
     {
-        if (auth()->user()->isKader() && $kelompok->jorong !== auth()->user()->jorong) {
+        if (auth()->user()->isKader() && $kelompok->id !== auth()->user()->kelompok_id) {
             abort(403, 'Unauthorized action.');
         }
 

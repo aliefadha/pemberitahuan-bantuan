@@ -37,6 +37,7 @@ class WhatsAppController extends Controller
     public function status()
     {
         $this->checkAdmin();
+
         return response()->json($this->whatsAppService->getStatus());
     }
 
@@ -71,10 +72,11 @@ class WhatsAppController extends Controller
             $request->phone,
             $request->message
         );
+        $success = $result !== null;
 
         return response()->json([
-            'success' => $result,
-            'message' => $result ? 'Message sent successfully' : 'Failed to send message',
+            'success' => $success,
+            'message' => $success ? 'Message sent successfully' : 'Failed to send message',
         ]);
     }
 }

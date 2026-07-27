@@ -19,7 +19,7 @@ class UserController extends Controller
         $query = User::latest();
 
         if (auth()->user()->isKader()) {
-            $query->where('jorong', auth()->user()->jorong);
+            $query->where('kelompok_id', auth()->user()->kelompok_id);
         }
 
         if ($search = $request->input('search')) {
@@ -43,7 +43,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         if (auth()->user()->isKader()) {
-            $request->merge(['jorong' => auth()->user()->jorong]);
+            $kelompok = auth()->user()->kelompok;
+            abort_unless($kelompok, 403, 'Kader harus tergabung dalam kelompok.');
+            $request->merge(['jorong' => $kelompok->jorong, 'kelompok_id' => $kelompok->id]);
         }
 
         $rolesAllowed = auth()->user()->isKader() ? ['peserta'] : ['admin', 'peserta', 'kader'];
@@ -62,6 +64,7 @@ class UserController extends Controller
             'role'       => ['required', Rule::in($rolesAllowed)],
             'no_telepon' => ['required', 'string', 'max:20', 'unique:users'],
             'jorong'     => $jorongRules,
+            'kelompok_id' => ['nullable', 'exists:kelompoks,id'],
             'password'   => ['required', 'confirmed', Rules\Password::defaults()],
             'anggota_keluarga'                         => ['nullable', 'array'],
             'anggota_keluarga.*.nama'                  => ['required', 'string', 'max:255'],
@@ -86,6 +89,7 @@ class UserController extends Controller
                 'no_telepon' => $request->no_telepon,
                 'password'   => Hash::make($request->password),
                 'jorong'     => $request->jorong,
+                'kelompok_id' => $request->kelompok_id,
             ]);
 
             if (auth()->user()->role === 'admin') {
@@ -100,7 +104,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        if (auth()->user()->isKader() && $user->jorong !== auth()->user()->jorong) {
+        if (auth()->user()->isKader() && ($user->kelompok_id !== auth()->user()->kelompok_id || $user->role !== 'peserta')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -108,7 +112,7 @@ class UserController extends Controller
         
         $kelompoksQuery = Kelompok::orderBy('jorong')->orderBy('name');
         if (auth()->user()->isKader()) {
-            $kelompoksQuery->where('jorong', auth()->user()->jorong);
+            $kelompoksQuery->whereKey(auth()->user()->kelompok_id);
         }
         $kelompoks = $kelompoksQuery->get();
 
@@ -117,12 +121,14 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if (auth()->user()->isKader() && ($user->jorong !== auth()->user()->jorong || $user->role === 'admin')) {
+        if (auth()->user()->isKader() && ($user->kelompok_id !== auth()->user()->kelompok_id || $user->role !== 'peserta')) {
             abort(403, 'Unauthorized action.');
         }
 
         if (auth()->user()->isKader()) {
-            $request->merge(['jorong' => auth()->user()->jorong]);
+            $kelompok = auth()->user()->kelompok;
+            abort_unless($kelompok, 403, 'Kader harus tergabung dalam kelompok.');
+            $request->merge(['jorong' => $kelompok->jorong, 'kelompok_id' => $kelompok->id]);
         }
 
         $rolesAllowed = auth()->user()->isKader() ? [$user->role] : ['admin', 'peserta', 'kader'];
@@ -216,7 +222,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if (auth()->user()->isKader() && ($user->jorong !== auth()->user()->jorong || $user->role === 'admin')) {
+        if (auth()->user()->isKader() && ($user->kelompok_id !== auth()->user()->kelompok_id || $user->role !== 'peserta')) {
             abort(403, 'Unauthorized action.');
         }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
+use App\Models\Kelompok;
 use App\Models\User;
 use App\Notifications\KegiatanNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,7 +18,7 @@ class KegiatanController extends Controller
     {
         $query = Kegiatan::latest();
         if (auth()->user()->isKader()) {
-            $query->where('jorong', auth()->user()->jorong);
+            $query->where('kelompok_id', auth()->user()->kelompok_id);
         }
 
         if ($search = $request->input('search')) {
@@ -34,13 +35,16 @@ class KegiatanController extends Controller
 
     public function create()
     {
-        return view('admin.kegiatans.create');
+        $kelompoks = $this->availableKelompoks();
+
+        return view('admin.kegiatans.create', compact('kelompoks'));
     }
 
     public function store(Request $request)
     {
         if (auth()->user()->isKader()) {
-            $request->merge(['jorong' => auth()->user()->jorong]);
+            $kelompok = $this->currentKelompok();
+            $request->merge(['jorong' => $kelompok->jorong, 'kelompok_id' => $kelompok->id]);
         }
 
         $jorongRules = ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
@@ -57,6 +61,7 @@ class KegiatanController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'tanggal' => ['required', 'date'],
             'jorong' => $jorongRules,
+            'kelompok_id' => $this->kelompokRules($request),
         ]);
 
         $kegiatan = Kegiatan::create([
@@ -64,6 +69,7 @@ class KegiatanController extends Controller
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
             'jorong' => $request->jorong,
+            'kelompok_id' => $request->kelompok_id,
         ]);
 
         $query = User::where('role', 'peserta')
@@ -71,6 +77,9 @@ class KegiatanController extends Controller
 
         if ($kegiatan->jorong) {
             $query->where('jorong', $kegiatan->jorong);
+        }
+        if ($kegiatan->kelompok_id) {
+            $query->where('kelompok_id', $kegiatan->kelompok_id);
         }
 
         $usersToNotify = $query->get();
@@ -83,15 +92,16 @@ class KegiatanController extends Controller
 
     public function show(Kegiatan $kegiatan)
     {
-        if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeKegiatan($kegiatan);
         // Get all users in the activity's jorong (excluding admin)
         $pesertas = User::where('jorong', $kegiatan->jorong)
             ->whereNotIn('role', ['admin', 'kader'])
             ->with('kelompok')
             ->orderBy('name')
             ->get();
+        if ($kegiatan->kelompok_id) {
+            $pesertas = $pesertas->where('kelompok_id', $kegiatan->kelompok_id)->values();
+        }
 
         // Get response statuses mapped by user_id
         $responses = DB::table('kegiatan_user')
@@ -105,14 +115,15 @@ class KegiatanController extends Controller
 
     public function notify(Kegiatan $kegiatan)
     {
-        if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeKegiatan($kegiatan);
         $query = User::where('role', 'peserta')
             ->whereNotNull('no_telepon');
 
         if ($kegiatan->jorong) {
             $query->where('jorong', $kegiatan->jorong);
+        }
+        if ($kegiatan->kelompok_id) {
+            $query->where('kelompok_id', $kegiatan->kelompok_id);
         }
 
         $usersToNotify = $query->get();
@@ -125,20 +136,18 @@ class KegiatanController extends Controller
 
     public function edit(Kegiatan $kegiatan)
     {
-        if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
-            abort(403, 'Unauthorized action.');
-        }
-        return view('admin.kegiatans.edit', compact('kegiatan'));
+        $this->authorizeKegiatan($kegiatan);
+        $kelompoks = $this->availableKelompoks();
+        return view('admin.kegiatans.edit', compact('kegiatan', 'kelompoks'));
     }
 
     public function update(Request $request, Kegiatan $kegiatan)
     {
-        if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeKegiatan($kegiatan);
 
         if (auth()->user()->isKader()) {
-            $request->merge(['jorong' => auth()->user()->jorong]);
+            $kelompok = $this->currentKelompok();
+            $request->merge(['jorong' => $kelompok->jorong, 'kelompok_id' => $kelompok->id]);
         }
 
         $jorongRules = ['required', 'string', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
@@ -155,6 +164,7 @@ class KegiatanController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'tanggal' => ['required', 'date'],
             'jorong' => $jorongRules,
+            'kelompok_id' => $this->kelompokRules($request),
         ]);
 
         $kegiatan->update([
@@ -162,6 +172,7 @@ class KegiatanController extends Controller
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
             'jorong' => $request->jorong,
+            'kelompok_id' => $request->kelompok_id,
         ]);
 
         return redirect()->route('admin.kegiatans.index')->with('success', 'Kegiatan berhasil diupdate.');
@@ -169,9 +180,7 @@ class KegiatanController extends Controller
 
     public function destroy(Kegiatan $kegiatan)
     {
-        if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeKegiatan($kegiatan);
 
         $kegiatan->delete();
 
@@ -182,7 +191,7 @@ class KegiatanController extends Controller
     {
         $query = Kegiatan::latest();
         if (auth()->user()->isKader()) {
-            $query->where('jorong', auth()->user()->jorong);
+            $query->where('kelompok_id', auth()->user()->kelompok_id);
         }
         $kegiatans = $query->get();
 
@@ -196,9 +205,7 @@ class KegiatanController extends Controller
 
     public function exportPdfDetail(Kegiatan $kegiatan)
     {
-        if (auth()->user()->isKader() && $kegiatan->jorong !== auth()->user()->jorong) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorizeKegiatan($kegiatan);
 
         // Get all users in the activity's jorong (excluding admin)
         $pesertas = User::where('jorong', $kegiatan->jorong)
@@ -206,6 +213,9 @@ class KegiatanController extends Controller
             ->with('kelompok')
             ->orderBy('name')
             ->get();
+        if ($kegiatan->kelompok_id) {
+            $pesertas = $pesertas->where('kelompok_id', $kegiatan->kelompok_id)->values();
+        }
 
         // Get response statuses mapped by user_id
         $responses = DB::table('kegiatan_user')
@@ -222,5 +232,48 @@ class KegiatanController extends Controller
         $filename = 'laporan-kegiatan-' . str($kegiatan->judul)->slug() . '-' . now()->format('Ymd-His') . '.pdf';
 
         return $pdf->download($filename);
+    }
+
+    private function currentKelompok(): Kelompok
+    {
+        $kelompok = auth()->user()->kelompok;
+        abort_unless($kelompok, 403, 'Kader harus tergabung dalam kelompok.');
+
+        return $kelompok;
+    }
+
+    private function authorizeKegiatan(Kegiatan $kegiatan): void
+    {
+        if (auth()->user()->isKader() && $kegiatan->kelompok_id !== auth()->user()->kelompok_id) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
+    private function availableKelompoks()
+    {
+        $query = Kelompok::orderBy('jorong')->orderBy('name');
+        if (auth()->user()->isKader()) {
+            $query->whereKey(auth()->user()->kelompok_id);
+        }
+
+        return $query->get();
+    }
+
+    private function kelompokRules(Request $request): array
+    {
+        return [
+            auth()->user()->isKader() ? 'required' : 'nullable',
+            'exists:kelompoks,id',
+            function ($attribute, $value, $fail) use ($request) {
+                if (! $value) {
+                    return;
+                }
+
+                $kelompok = Kelompok::find($value);
+                if (! $kelompok || $kelompok->jorong !== $request->jorong) {
+                    $fail('Kelompok harus berada di jorong yang sama dengan kegiatan.');
+                }
+            },
+        ];
     }
 }

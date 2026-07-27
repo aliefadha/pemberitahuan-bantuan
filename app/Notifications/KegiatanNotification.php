@@ -35,9 +35,10 @@ class KegiatanNotification extends Notification
     {
         $jorongStr = $this->kegiatan->jorong_label ? "\nJorong: {$this->kegiatan->jorong_label}" : '';
         $url = route('kegiatan.show', $this->kegiatan);
+        $replyInstructions = "\n\nBalas langsung pesan ini menggunakan fitur Reply/Balas dengan:\n- bersedia\n- tidak bersedia <alasan>\n\nContoh: tidak bersedia karena sakit";
         $message = match ($this->type) {
-            'created' => "📢 *Kegiatan Baru*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nDeskripsi: {$this->kegiatan->deskripsi}\n\nCek kegiatan pada sistem:\n{$url}",
-            'updated' => "📝 *Kegiatan Diupdate*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nCek kegiatan pada sistem:\n{$url}",
+            'created' => "📢 *Kegiatan Baru*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nDeskripsi: {$this->kegiatan->deskripsi}\n\nCek kegiatan pada sistem:\n{$url}{$replyInstructions}",
+            'updated' => "📝 *Kegiatan Diupdate*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nCek kegiatan pada sistem:\n{$url}{$replyInstructions}",
             'deleted' => "🗑️ *Kegiatan Dihapus*\n\nKegiatan '{$this->kegiatan->judul}' telah dibatalkan.",
             default => "Ada perubahan pada kegiatan: {$this->kegiatan->judul}\n\nCek kegiatan pada sistem:\n{$url}",
         };
@@ -45,6 +46,8 @@ class KegiatanNotification extends Notification
         return [
             'phone' => $notifiable->whatsapp_number,
             'message' => $message,
+            'kegiatan_id' => $this->kegiatan->id,
+            'track_response' => in_array($this->type, ['created', 'updated'], true),
         ];
     }
 

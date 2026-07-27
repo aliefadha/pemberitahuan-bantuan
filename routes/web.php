@@ -7,7 +7,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WhatsAppController;
+use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/webhooks/whatsapp/messages', WhatsAppWebhookController::class)
+    ->name('webhooks.whatsapp.messages');
 
 Route::get('/', function () {
     try {

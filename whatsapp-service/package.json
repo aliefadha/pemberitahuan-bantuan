@@ -4,8 +4,9 @@
   "description": "WhatsApp Web Service for Laravel",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "start": "node --env-file=../.env index.js",
+    "dev": "node --env-file=../.env index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",

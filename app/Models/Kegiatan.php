@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Kegiatan extends Model
 {
@@ -12,6 +13,7 @@ class Kegiatan extends Model
         'deskripsi',
         'tanggal',
         'jorong',
+        'kelompok_id',
     ];
 
     protected $casts = [
@@ -21,6 +23,11 @@ class Kegiatan extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)->withPivot('status', 'alasan')->withTimestamps();
+    }
+
+    public function kelompok(): BelongsTo
+    {
+        return $this->belongsTo(Kelompok::class);
     }
 
     /**

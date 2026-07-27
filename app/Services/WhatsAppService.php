@@ -64,12 +64,15 @@ class WhatsAppService
         }
     }
 
-    public function sendMessage(string $phone, string $message): bool
+    /**
+     * @return array{message_id: string, chat_id: string}|null
+     */
+    public function sendMessage(string $phone, string $message): ?array
     {
         $cleanPhone = $this->formatPhoneNumber($phone);
 
         if (! $cleanPhone) {
-            return false;
+            return null;
         }
 
         try {
@@ -79,11 +82,23 @@ class WhatsAppService
                     'message' => $message,
                 ]);
 
-            return $response->successful() && $response->json('success') === true;
+            if (
+                ! $response->successful()
+                || $response->json('success') !== true
+                || ! is_string($response->json('message_id'))
+                || ! is_string($response->json('chat_id'))
+            ) {
+                return null;
+            }
+
+            return [
+                'message_id' => $response->json('message_id'),
+                'chat_id' => $response->json('chat_id'),
+            ];
         } catch (\Exception $e) {
             \Log::error('WhatsApp send failed: '.$e->getMessage());
 
-            return false;
+            return null;
         }
     }
 
