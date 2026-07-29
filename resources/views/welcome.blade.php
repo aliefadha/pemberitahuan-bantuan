@@ -52,7 +52,7 @@
                         </a>
                     @else
                         <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-xl text-amber-900 bg-amber-100/80 hover:bg-amber-200 border border-amber-200/60 shadow-sm hover:scale-[1.01] active:scale-[0.99] transition duration-200">
-                            Login Member
+                            Login Ke Aplikasi
                         </a>
                     @endauth
                 @endif
@@ -85,11 +85,11 @@
                 <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-2xl text-amber-900 bg-amber-100/90 hover:bg-amber-200/95 border border-amber-200/60 shadow-md shadow-amber-100/40 hover:-translate-y-0.5 transition duration-200">
+                            <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto items-center justify-center px-8 py-4 text-base font-bold rounded-2xl text-amber-900 bg-amber-100/90 hover:bg-amber-200/95 border border-amber-200/60 shadow-md shadow-amber-100/40 hover:-translate-y-0.5 transition duration-200 hidden">
                                 Masuk Dashboard
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-2xl text-amber-900 bg-amber-100/90 hover:bg-amber-200/95 border border-amber-200/60 shadow-md shadow-amber-100/40 hover:-translate-y-0.5 transition duration-200">
+                            <a href="{{ route('login') }}" class="w-full sm:w-auto items-center justify-center px-8 py-4 text-base font-bold rounded-2xl text-amber-900 bg-amber-100/90 hover:bg-amber-200/95 border border-amber-200/60 shadow-md shadow-amber-100/40 hover:-translate-y-0.5 transition duration-200 hidden">
                                 Login Ke Aplikasi
                             </a>
                         @endauth

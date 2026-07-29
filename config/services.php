@@ -35,6 +35,11 @@ return [
         ],
     ],
 
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
     'whatsapp' => [
         'url' => env('WHATSAPP_SERVICE_URL', 'http://localhost:3001'),
         'webhook_secret' => env('WHATSAPP_WEBHOOK_SECRET'),

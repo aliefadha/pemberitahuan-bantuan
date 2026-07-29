@@ -5,6 +5,16 @@ function serializedMessageId(message) {
     return message?.id?._serialized ?? null;
 }
 
+function quotedMessageIdFromMetadata(message) {
+    const quotedId = message?._data?.quotedMsg?.id;
+
+    if (typeof quotedId === 'string') {
+        return quotedId;
+    }
+
+    return quotedId?._serialized ?? null;
+}
+
 function createIncomingMessageHandler({
     laravelAppUrl,
     webhookSecret,
@@ -22,9 +32,9 @@ function createIncomingMessageHandler({
         }
 
         try {
-            let quotedMessageId = null;
+            let quotedMessageId = quotedMessageIdFromMetadata(message);
 
-            if (message.hasQuotedMsg) {
+            if (message.hasQuotedMsg && !quotedMessageId) {
                 const quotedMessage = await message.getQuotedMessage();
                 quotedMessageId = serializedMessageId(quotedMessage);
 
@@ -82,5 +92,6 @@ function createIncomingMessageHandler({
 module.exports = {
     RETRY_MESSAGE,
     createIncomingMessageHandler,
+    quotedMessageIdFromMetadata,
     serializedMessageId
 };

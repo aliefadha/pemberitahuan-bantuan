@@ -49,12 +49,14 @@
                     </svg>
                     Export PDF
                 </a>
-                <a href="{{ route('admin.kelompoks.create') }}" class="inline-flex items-center gap-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Tambah Kelompok
-                </a>
+                @unless(auth()->user()->isKader())
+                    <a href="{{ route('admin.kelompoks.create') }}" class="inline-flex items-center gap-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Kelompok
+                    </a>
+                @endunless
             </div>
         </div>
         <div class="overflow-x-auto">

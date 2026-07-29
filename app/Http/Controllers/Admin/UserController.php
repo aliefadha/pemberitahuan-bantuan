@@ -37,7 +37,9 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('admin.users.create');
+        $kelompoks = Kelompok::orderBy('jorong')->orderBy('name')->get();
+
+        return view('admin.users.create', compact('kelompoks'));
     }
 
     public function store(Request $request)
@@ -49,7 +51,11 @@ class UserController extends Controller
         }
 
         $rolesAllowed = auth()->user()->isKader() ? ['peserta'] : ['admin', 'peserta', 'kader'];
-        $jorongRules = [$request->role === 'admin' ? 'nullable' : 'required', 'in:padang_rantang,tanjung_pati,koto_tuo,pulutan'];
+        $jorongRules = [
+            Rule::requiredIf(in_array($request->role, ['kader', 'peserta'], true)),
+            'nullable',
+            'in:padang_rantang,tanjung_pati,koto_tuo,pulutan',
+        ];
         if (auth()->user()->isKader()) {
             $jorongRules[] = function ($attribute, $value, $fail) {
                 if ($value !== auth()->user()->jorong) {
@@ -64,7 +70,21 @@ class UserController extends Controller
             'role'       => ['required', Rule::in($rolesAllowed)],
             'no_telepon' => ['required', 'string', 'max:20', 'unique:users'],
             'jorong'     => $jorongRules,
-            'kelompok_id' => ['nullable', 'exists:kelompoks,id'],
+            'kelompok_id' => [
+                Rule::requiredIf(in_array($request->role, ['kader', 'peserta'], true)),
+                'nullable',
+                'exists:kelompoks,id',
+                function ($attribute, $value, $fail) use ($request) {
+                    if (! $value || $request->role === 'admin') {
+                        return;
+                    }
+
+                    $kelompok = Kelompok::find($value);
+                    if (! $kelompok || $kelompok->jorong !== $request->jorong) {
+                        $fail('Kelompok yang dipilih harus berada di jorong yang sama dengan user.');
+                    }
+                },
+            ],
             'password'   => ['required', 'confirmed', Rules\Password::defaults()],
             'anggota_keluarga'                         => ['nullable', 'array'],
             'anggota_keluarga.*.nama'                  => ['required', 'string', 'max:255'],

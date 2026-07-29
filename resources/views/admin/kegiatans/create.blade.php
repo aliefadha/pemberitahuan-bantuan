@@ -27,15 +27,36 @@
                     </div>
 
                     <div>
+                        <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong <span class="text-red-500">*</span></label>
+                        @if(auth()->user()->isKader())
+                            <select class="w-full rounded-lg border border-gray-300 bg-gray-100 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500" id="jorong" disabled>
+                                <option value="{{ auth()->user()->jorong }}" selected>{{ auth()->user()->jorong_label }}</option>
+                            </select>
+                            <input type="hidden" name="jorong" value="{{ auth()->user()->jorong }}">
+                        @else
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('jorong') border-red-500 @enderror" id="jorong" name="jorong" required>
+                                <option value="">-- Pilih Jorong --</option>
+                                <option value="padang_rantang" {{ old('jorong') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
+                                <option value="tanjung_pati"   {{ old('jorong') == 'tanjung_pati'   ? 'selected' : '' }}>Tanjung Pati</option>
+                                <option value="koto_tuo"       {{ old('jorong') == 'koto_tuo'       ? 'selected' : '' }}>Koto Tuo</option>
+                                <option value="pulutan"        {{ old('jorong') == 'pulutan'        ? 'selected' : '' }}>Pulutan</option>
+                            </select>
+                        @endif
+                        @error('jorong')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
                         <label for="kelompok_id" class="block text-sm font-medium text-gray-700 mb-1">Kelompok</label>
                         @if(auth()->user()->isKader())
                             <input type="text" class="w-full rounded-lg border border-gray-300 bg-gray-100 shadow-sm py-1.5 px-2" value="{{ auth()->user()->kelompok?->name }}" disabled>
                             <input type="hidden" name="kelompok_id" value="{{ auth()->user()->kelompok_id }}">
                         @else
-                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2" id="kelompok_id" name="kelompok_id">
-                                <option value="">-- Semua kelompok di jorong --</option>
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 disabled:bg-gray-100 disabled:text-gray-500" id="kelompok_id" name="kelompok_id" disabled>
+                                <option value="">-- Pilih Jorong terlebih dahulu --</option>
                                 @foreach($kelompoks as $kelompok)
-                                    <option value="{{ $kelompok->id }}" {{ old('kelompok_id') == $kelompok->id ? 'selected' : '' }}>{{ $kelompok->name }} — {{ $kelompok->jorong_label }}</option>
+                                    <option value="{{ $kelompok->id }}" data-jorong="{{ $kelompok->jorong }}" {{ old('kelompok_id') == $kelompok->id ? 'selected' : '' }}>{{ $kelompok->name }}</option>
                                 @endforeach
                             </select>
                         @endif
@@ -58,27 +79,6 @@
                         @enderror
                     </div>
 
-                    <div>
-                        <label for="jorong" class="block text-sm font-medium text-gray-700 mb-1">Jorong <span class="text-red-500">*</span></label>
-                        @if(auth()->user()->isKader())
-                            <select class="w-full rounded-lg border border-gray-300 bg-gray-100 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500" id="jorong_disabled" disabled>
-                                <option value="{{ auth()->user()->jorong }}" selected>{{ auth()->user()->jorong_label }}</option>
-                            </select>
-                            <input type="hidden" name="jorong" value="{{ auth()->user()->jorong }}">
-                        @else
-                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('jorong') border-red-500 @enderror" id="jorong" name="jorong" required>
-                                <option value="">-- Pilih Jorong --</option>
-                                <option value="padang_rantang" {{ old('jorong') == 'padang_rantang' ? 'selected' : '' }}>Padang Rantang</option>
-                                <option value="tanjung_pati"   {{ old('jorong') == 'tanjung_pati'   ? 'selected' : '' }}>Tanjung Pati</option>
-                                <option value="koto_tuo"       {{ old('jorong') == 'koto_tuo'       ? 'selected' : '' }}>Koto Tuo</option>
-                                <option value="pulutan"        {{ old('jorong') == 'pulutan'        ? 'selected' : '' }}>Pulutan</option>
-                            </select>
-                        @endif
-                        @error('jorong')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <div class="pt-4 flex items-center gap-3">
                         <button type="submit" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
                             Simpan
@@ -88,4 +88,37 @@
             </div>
         </div>
     </div>
+
+    @unless(auth()->user()->isKader())
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const jorong = document.getElementById('jorong');
+                const kelompok = document.getElementById('kelompok_id');
+                const placeholder = kelompok.options[0];
+
+                const filterKelompok = (resetSelection = false) => {
+                    const selectedJorong = jorong.value;
+                    const hasJorong = selectedJorong !== '';
+
+                    kelompok.disabled = !hasJorong;
+                    placeholder.textContent = hasJorong
+                        ? '-- Semua kelompok di jorong --'
+                        : '-- Pilih Jorong terlebih dahulu --';
+
+                    Array.from(kelompok.options).slice(1).forEach((option) => {
+                        const matchesJorong = option.dataset.jorong === selectedJorong;
+                        option.hidden = !matchesJorong;
+                        option.disabled = !matchesJorong;
+                    });
+
+                    if (resetSelection || (kelompok.value && kelompok.selectedOptions[0].dataset.jorong !== selectedJorong)) {
+                        kelompok.value = '';
+                    }
+                };
+
+                filterKelompok();
+                jorong.addEventListener('change', () => filterKelompok(true));
+            });
+        </script>
+    @endunless
 </x-app-layout>

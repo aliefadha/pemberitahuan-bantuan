@@ -4,6 +4,7 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const path = require('path');
 const { createIncomingMessageHandler } = require('./message-handler');
+const { sendTrackedMessage } = require('./send-message');
 
 const app = express();
 const PORT = Number(process.env.WHATSAPP_SERVICE_PORT ?? 3001);
@@ -125,8 +126,7 @@ app.post('/send', async (req, res) => {
 
     try {
         const chatId = phone.includes('@c.us') ? phone : `${phone}@c.us`;
-        const sentMessage = await client.sendMessage(chatId, message);
-        const messageId = sentMessage?.id?._serialized;
+        const { messageId } = await sendTrackedMessage(client, chatId, message);
 
         if (!messageId) {
             throw new Error('WhatsApp did not return a message ID');

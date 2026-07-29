@@ -74,6 +74,21 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <div id="kelompok-container">
+                            <label for="kelompok_id" class="block text-sm font-medium text-gray-700 mb-1">Kelompok <span class="text-red-500">*</span></label>
+                            <select class="w-full rounded-lg border border-gray-300 shadow-sm py-1.5 px-2 focus:border-gray-500 focus:ring-gray-500 @error('kelompok_id') border-red-500 @enderror" id="kelompok_id" name="kelompok_id">
+                                <option value="">-- Pilih Kelompok --</option>
+                                @foreach($kelompoks as $kelompok)
+                                    <option value="{{ $kelompok->id }}" data-jorong="{{ $kelompok->jorong }}" {{ old('kelompok_id') == $kelompok->id ? 'selected' : '' }}>
+                                        {{ $kelompok->name }} — {{ $kelompok->jorong_label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('kelompok_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -112,6 +127,8 @@
         var roleSelect = document.getElementById('role');
         var jorongContainer = document.getElementById('jorong-container');
         var jorongSelect = document.getElementById('jorong');
+        var kelompokContainer = document.getElementById('kelompok-container');
+        var kelompokSelect = document.getElementById('kelompok_id');
         var anggotaKeluargaContainer = document.getElementById('anggota-keluarga-container');
 
         function handleRoleChange() {
@@ -144,10 +161,46 @@
                     jorongSelect.setAttribute('required', 'required');
                 }
             }
+
+            if (kelompokContainer) {
+                kelompokContainer.style.display = ['kader', 'peserta'].includes(selectedRole) ? 'block' : 'none';
+            }
+            if (kelompokSelect) {
+                if (['kader', 'peserta'].includes(selectedRole)) {
+                    kelompokSelect.setAttribute('required', 'required');
+                    filterKelompok();
+                } else {
+                    kelompokSelect.removeAttribute('required');
+                    kelompokSelect.value = '';
+                }
+            }
+        }
+
+        function filterKelompok() {
+            if (!kelompokSelect || !jorongSelect) {
+                return;
+            }
+
+            var selectedJorong = jorongSelect.value;
+            Array.from(kelompokSelect.options).forEach(function (option, index) {
+                if (index === 0) {
+                    return;
+                }
+
+                var matchesJorong = option.dataset.jorong === selectedJorong;
+                option.hidden = !matchesJorong;
+                option.disabled = !matchesJorong;
+                if (!matchesJorong && option.selected) {
+                    kelompokSelect.value = '';
+                }
+            });
         }
 
         if (roleSelect && roleSelect.tagName === 'SELECT') {
             roleSelect.addEventListener('change', handleRoleChange);
+        }
+        if (jorongSelect && jorongSelect.tagName === 'SELECT') {
+            jorongSelect.addEventListener('change', filterKelompok);
         }
         handleRoleChange(); // Run on initial load
 

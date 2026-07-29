@@ -60,6 +60,41 @@ test('forwards a quoted direct message and sends Laravel confirmation', async ()
     assert.equal(result.processed, true);
 });
 
+test('uses quoted metadata without calling the unstable quoted-message lookup', async () => {
+    let lookupCalled = false;
+    let payload;
+    const handler = createIncomingMessageHandler({
+        laravelAppUrl: 'http://laravel.test',
+        webhookSecret: 'shared-secret',
+        fetchImpl: async (url, options) => {
+            payload = JSON.parse(options.body);
+            return response({ processed: true });
+        }
+    });
+
+    const result = await handler({
+        id: { _serialized: 'incoming-1' },
+        _data: {
+            quotedMsg: {
+                id: { _serialized: 'outbound-from-metadata' }
+            }
+        },
+        from: '6281234567890@c.us',
+        fromMe: false,
+        body: 'bersedia',
+        hasQuotedMsg: true,
+        getQuotedMessage: async () => {
+            lookupCalled = true;
+            throw new Error('unstable Store.QuotedMsg lookup');
+        },
+        reply: async () => {}
+    });
+
+    assert.equal(result.processed, true);
+    assert.equal(payload.quoted_message_id, 'outbound-from-metadata');
+    assert.equal(lookupCalled, false);
+});
+
 test('ignores messages from groups', async () => {
     let called = false;
     const handler = createIncomingMessageHandler({

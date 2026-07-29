@@ -30,6 +30,14 @@
             <label class="ml-2 text-sm font-semibold text-slate-600" for="customCheck">Ingat Saya</label>
         </div>
 
+        <div>
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+            @error('g-recaptcha-response')
+                <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
+            @enderror
+        </div>
+
         <button type="submit" class="w-full px-4 py-3 bg-amber-100 hover:bg-amber-200 border border-amber-200/60 text-amber-900 font-bold rounded-xl shadow-md shadow-amber-100/40 hover:-translate-y-0.5 active:translate-y-0 transition duration-150">
             Masuk
         </button>

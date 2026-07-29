@@ -5,7 +5,9 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -40,6 +42,8 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
+        $this->ensureCaptchaIsValid();
+
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
@@ -51,6 +55,43 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    /**
+     * Ensure the submitted reCAPTCHA v2 response was verified by Google.
+     *
+     * @throws ValidationException
+     */
+    public function ensureCaptchaIsValid(): void
+    {
+        $token = $this->string('g-recaptcha-response')->toString();
+        $secret = config('services.recaptcha.secret_key');
+
+        if (blank($token) || blank($secret)) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Silakan selesaikan verifikasi CAPTCHA.',
+            ]);
+        }
+
+        try {
+            $response = Http::asForm()
+                ->timeout(10)
+                ->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => $secret,
+                    'response' => $token,
+                    'remoteip' => $this->ip(),
+                ]);
+        } catch (ConnectionException) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi CAPTCHA sedang tidak tersedia. Silakan coba lagi.',
+            ]);
+        }
+
+        if (! $response->successful() || ! $response->json('success')) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi CAPTCHA gagal. Silakan coba lagi.',
+            ]);
+        }
     }
 
     /**
