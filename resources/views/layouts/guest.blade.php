@@ -21,6 +21,14 @@
     </style>
 </head>
 <body class="bg-gradient-to-b from-amber-50/30 via-white to-amber-50/10 text-slate-800 min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 relative overflow-x-hidden">
+    @php
+        $containerWidth = match ($maxWidth ?? 'md') {
+            '2xl' => 'max-w-2xl',
+            'xl' => 'max-w-xl',
+            'lg' => 'max-w-lg',
+            default => 'max-w-md',
+        };
+    @endphp
 
     <!-- Decorative Top Accent -->
     <div class="absolute top-0 inset-x-0 h-1.5 bg-amber-200"></div>
@@ -30,7 +38,7 @@
     <div class="absolute top-48 right-1/4 w-80 h-80 bg-amber-100/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
     <div class="min-h-screen flex flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
-        <div class="w-full max-w-md">
+        <div @class(['w-full', $containerWidth])>
 
             <!-- Logo Section -->
             <div class="flex flex-col items-center mb-8">
@@ -43,9 +51,9 @@
             </div>
 
             <!-- Card Box -->
-            <div class="bg-white rounded-[2rem] shadow-xl border border-amber-100/80 p-5 sm:p-10 relative overflow-hidden">
+            <div class="bg-white rounded-2xl sm:rounded-[2rem] shadow-xl border border-amber-100/80 p-4 sm:p-8 lg:p-10 relative overflow-hidden">
                 <div class="text-center mb-6">
-                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">{{ $title ?? '' }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $title ?? '' }}</h1>
                 </div>
                 {{ $slot }}
             </div>

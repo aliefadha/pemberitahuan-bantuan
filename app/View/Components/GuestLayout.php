@@ -7,7 +7,10 @@ use Illuminate\View\View;
 
 class GuestLayout extends Component
 {
-    public function __construct(public string $title = '') {}
+    public function __construct(
+        public string $title = '',
+        public string $maxWidth = 'md',
+    ) {}
 
     /**
      * Get the view / contents that represents the component.
