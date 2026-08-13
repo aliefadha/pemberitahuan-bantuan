@@ -4,14 +4,11 @@ use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Admin\KelompokController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestKegiatanController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WhatsAppController;
-use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
-
-Route::post('/webhooks/whatsapp/messages', WhatsAppWebhookController::class)
-    ->name('webhooks.whatsapp.messages');
 
 Route::get('/', function () {
     try {
@@ -27,6 +24,13 @@ Route::get('/', function () {
     }
 
     return view('welcome', compact('totalAnggota', 'totalKeluarga', 'totalBroadcast', 'totalKelompok'));
+});
+
+Route::middleware(['signed', 'throttle:20,1'])->group(function () {
+    Route::get('/konfirmasi-kegiatan/{kegiatan}/{user}', [GuestKegiatanController::class, 'show'])
+        ->name('kegiatan.guest.show');
+    Route::post('/konfirmasi-kegiatan/{kegiatan}/{user}/tanggapan', [GuestKegiatanController::class, 'respond'])
+        ->name('kegiatan.guest.respond');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])

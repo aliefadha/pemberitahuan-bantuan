@@ -11,23 +11,37 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="font-sans antialiased">
-    <div x-data="{ sidebarOpen: false, collapsed: false }" class="min-h-screen bg-gray-100">
+<body class="font-sans antialiased overflow-x-hidden">
+    <div x-data="{ sidebarOpen: false, collapsed: false }" @keydown.escape.window="sidebarOpen = false" class="min-h-screen bg-gray-100">
+        <div
+            x-cloak
+            x-show="sidebarOpen"
+            x-transition.opacity
+            @click="sidebarOpen = false"
+            class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
+            aria-hidden="true"
+        ></div>
+
         <x-sidebar />
 
-        <div class="flex flex-col min-h-screen transition-all duration-300 ease-in-out" :class="collapsed ? 'lg:ml-16' : 'lg:ml-64'">
+        <div class="flex min-w-0 flex-col min-h-screen transition-all duration-300 ease-in-out" :class="collapsed ? 'lg:ml-16' : 'lg:ml-64'">
             <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
                         <div class="flex items-center">
-                            <button @click="collapsed = !collapsed" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition">
+                            <button @click="sidebarOpen = true" class="p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition lg:hidden" aria-label="Buka menu" :aria-expanded="sidebarOpen">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
+                            <button @click="collapsed = !collapsed" class="hidden lg:block p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition" :aria-label="collapsed ? 'Perluas menu' : 'Ciutkan menu'">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                                 </svg>
                             </button>
                         </div>
 
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-1 sm:gap-4">
                             <div x-data="{ open: false }" class="relative">
                                 <button @click="open = !open" class="relative p-2 text-gray-400 hover:text-gray-500">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +55,7 @@
                                     @endif
                                 </button>
 
-                                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                <div x-cloak x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                                     <div class="p-3 border-b border-gray-200">
                                         <h3 class="font-semibold text-gray-700">Notifications</h3>
                                     </div>
@@ -80,7 +94,7 @@
                                     <span class="hidden sm:block text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
                                 </button>
 
-                                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                                <div x-cloak x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                                     <div class="px-4 py-2 border-b border-gray-100 bg-gray-50 text-xxs font-mono text-gray-400 select-all">
                                         ID: {{ Auth::user()->id }}
                                     </div>
@@ -106,7 +120,7 @@
                 </div>
             </nav>
 
-            <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8">
+            <main class="flex-1 min-w-0 py-4 px-3 sm:py-6 sm:px-6 lg:px-8">
                 {{ $slot }}
             </main>
 

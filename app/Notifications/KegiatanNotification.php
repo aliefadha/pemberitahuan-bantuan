@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Kegiatan;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\URL;
 
 class KegiatanNotification extends Notification
 {
@@ -34,11 +35,14 @@ class KegiatanNotification extends Notification
     public function toWhatsApp(object $notifiable): array
     {
         $jorongStr = $this->kegiatan->jorong_label ? "\nJorong: {$this->kegiatan->jorong_label}" : '';
-        $url = route('kegiatan.show', $this->kegiatan);
-        $replyInstructions = "\n\nBalas langsung pesan ini menggunakan fitur Reply/Balas dengan:\n- bersedia\n- tidak bersedia <alasan>\n\nContoh: tidak bersedia karena sakit";
+        $url = URL::temporarySignedRoute(
+            'kegiatan.guest.show',
+            now()->addMinutes(config('services.whatsapp.activity_link_expiration', 10080)),
+            ['kegiatan' => $this->kegiatan, 'user' => $notifiable]
+        );
         $message = match ($this->type) {
-            'created' => "📢 *Kegiatan Baru*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nDeskripsi: {$this->kegiatan->deskripsi}\n\nCek kegiatan pada sistem:\n{$url}{$replyInstructions}",
-            'updated' => "📝 *Kegiatan Diupdate*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nCek kegiatan pada sistem:\n{$url}{$replyInstructions}",
+            'created' => "📢 *Kegiatan Baru*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nDeskripsi: {$this->kegiatan->deskripsi}\n\nLihat detail dan konfirmasi kehadiran (tanpa login):\n{$url}",
+            'updated' => "📝 *Kegiatan Diupdate*\n\nJudul: {$this->kegiatan->judul}{$jorongStr}\n\nTanggal: {$this->kegiatan->tanggal->format('d/m/Y H:i')}\n\nLihat detail dan konfirmasi kehadiran (tanpa login):\n{$url}",
             'deleted' => "🗑️ *Kegiatan Dihapus*\n\nKegiatan '{$this->kegiatan->judul}' telah dibatalkan.",
             default => "Ada perubahan pada kegiatan: {$this->kegiatan->judul}\n\nCek kegiatan pada sistem:\n{$url}",
         };
@@ -46,8 +50,6 @@ class KegiatanNotification extends Notification
         return [
             'phone' => $notifiable->whatsapp_number,
             'message' => $message,
-            'kegiatan_id' => $this->kegiatan->id,
-            'track_response' => in_array($this->type, ['created', 'updated'], true),
         ];
     }
 

@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
 use App\Models\Kelompok;
-use App\Services\KegiatanResponseService;
+use App\Models\User;
+use App\Notifications\KegiatanResponseNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -57,11 +58,8 @@ class KegiatanController extends Controller
         return view('kegiatan.show', compact('kegiatan', 'status', 'alasan', 'kelompoks', 'responses'));
     }
 
-    public function respond(
-        Request $request,
-        Kegiatan $kegiatan,
-        KegiatanResponseService $responseService
-    ) {
+    public function respond(Request $request, Kegiatan $kegiatan)
+    {
         $request->validate([
             'status' => 'required|in:bersedia,tidak_bersedia',
             'alasan' => 'required_if:status,tidak_bersedia|nullable|string',
@@ -70,17 +68,18 @@ class KegiatanController extends Controller
         $status = $request->status;
         $alasan = $status === 'tidak_bersedia' ? $request->alasan : null;
 
-        $result = $responseService->submit(
-            $kegiatan,
-            auth()->user(),
-            $status,
-            $alasan
-        );
+        $kegiatan->users()->syncWithoutDetaching([
+            auth()->id() => [
+                'status' => $status,
+                'alasan' => $alasan,
+            ],
+        ]);
 
-        $message = $result === KegiatanResponseService::CREATED
-            ? 'Tanggapan Anda telah disimpan.'
-            : 'Tanggapan Anda telah diperbarui.';
+        $admins = User::whereIn('role', ['admin', 'kader'])->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new KegiatanResponseNotification($kegiatan, auth()->user(), $status, $alasan));
+        }
 
-        return redirect()->route('kegiatan.show', $kegiatan)->with('success', $message);
+        return redirect()->route('kegiatan.show', $kegiatan)->with('success', 'Tanggapan Anda telah disimpan.');
     }
 }

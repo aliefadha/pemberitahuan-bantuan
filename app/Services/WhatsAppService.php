@@ -2,26 +2,46 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WhatsAppService
 {
     private string $baseUrl;
 
+    private string $token;
+
     private int $timeout = 10;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.whatsapp.url', 'http://localhost:3001');
+        $this->baseUrl = rtrim(
+            (string) config('services.whatsapp.url', 'http://localhost:3001'),
+            '/'
+        );
+        $this->token = (string) config('services.whatsapp.token', '');
+    }
+
+    private function request(): PendingRequest
+    {
+        return Http::acceptJson()
+            ->withToken($this->token)
+            ->timeout($this->timeout);
     }
 
     public function isConnected(): bool
     {
         try {
-            $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/status");
+            $response = $this->request()->get("{$this->baseUrl}/status");
 
-            return $response->successful() && $response->json('ready') === true;
-        } catch (\Exception $e) {
+            return $response->successful()
+                && $response->json('ready') === true;
+        } catch (\Throwable $e) {
+            Log::warning('WhatsApp status check failed', [
+                'error' => $e->getMessage(),
+            ]);
+
             return false;
         }
     }
@@ -29,10 +49,22 @@ class WhatsAppService
     public function getStatus(): array
     {
         try {
-            $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/status");
+            $response = $this->request()->get("{$this->baseUrl}/status");
 
-            return $response->json();
-        } catch (\Exception $e) {
+            if (! $response->successful()) {
+                return [
+                    'status' => 'error',
+                    'ready' => false,
+                    'error' => "WhatsApp service returned HTTP {$response->status()}",
+                ];
+            }
+
+            return $response->json() ?? [
+                'status' => 'error',
+                'ready' => false,
+                'error' => 'WhatsApp service returned an invalid response',
+            ];
+        } catch (\Throwable $e) {
             return [
                 'status' => 'error',
                 'ready' => false,
@@ -44,18 +76,35 @@ class WhatsAppService
     public function getQrCode(): ?array
     {
         try {
-            $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/qr");
+            $response = $this->request()->get("{$this->baseUrl}/qr");
+
+            if (! $response->successful()) {
+                return [
+                    'status' => 'error',
+                    'qr' => null,
+                    'error' => "WhatsApp service returned HTTP {$response->status()}",
+                ];
+            }
+
             $data = $response->json();
 
-            if ($data['status'] === 'ready') {
+            if (! is_array($data)) {
+                return [
+                    'status' => 'error',
+                    'qr' => null,
+                    'error' => 'WhatsApp service returned an invalid response',
+                ];
+            }
+
+            if (($data['status'] ?? null) === 'ready') {
                 return null;
             }
 
             return [
-                'status' => $data['status'],
+                'status' => $data['status'] ?? 'unknown',
                 'qr' => $data['qr'] ?? null,
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return [
                 'status' => 'error',
                 'qr' => null,
@@ -76,11 +125,10 @@ class WhatsAppService
         }
 
         try {
-            $response = Http::timeout($this->timeout)
-                ->post("{$this->baseUrl}/send", [
-                    'phone' => $cleanPhone,
-                    'message' => $message,
-                ]);
+            $response = $this->request()->post("{$this->baseUrl}/send", [
+                'phone' => $cleanPhone,
+                'message' => $message,
+            ]);
 
             if (
                 ! $response->successful()
@@ -88,6 +136,10 @@ class WhatsAppService
                 || ! is_string($response->json('message_id'))
                 || ! is_string($response->json('chat_id'))
             ) {
+                Log::warning('WhatsApp send returned an invalid response', [
+                    'status' => $response->status(),
+                ]);
+
                 return null;
             }
 
@@ -95,8 +147,10 @@ class WhatsAppService
                 'message_id' => $response->json('message_id'),
                 'chat_id' => $response->json('chat_id'),
             ];
-        } catch (\Exception $e) {
-            \Log::error('WhatsApp send failed: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('WhatsApp send failed', [
+                'error' => $e->getMessage(),
+            ]);
 
             return null;
         }
@@ -105,10 +159,15 @@ class WhatsAppService
     public function restart(): bool
     {
         try {
-            $response = Http::timeout($this->timeout)->post("{$this->baseUrl}/restart");
+            $response = $this->request()->post("{$this->baseUrl}/restart");
 
-            return $response->successful();
-        } catch (\Exception $e) {
+            return $response->successful()
+                && $response->json('success') === true;
+        } catch (\Throwable $e) {
+            Log::error('WhatsApp restart failed', [
+                'error' => $e->getMessage(),
+            ]);
+
             return false;
         }
     }
@@ -117,15 +176,21 @@ class WhatsAppService
     {
         $clean = preg_replace('/[^0-9]/', '', $phone);
 
+        if (! $clean) {
+            return null;
+        }
+
         if (str_starts_with($clean, '0')) {
             $clean = '62'.substr($clean, 1);
         }
 
         if (str_starts_with($clean, '62')) {
-            return $clean;
+            return strlen($clean) >= 10 && strlen($clean) <= 15
+                ? $clean
+                : null;
         }
 
-        if (strlen($clean) >= 10) {
+        if (strlen($clean) >= 10 && strlen($clean) <= 13) {
             return '62'.$clean;
         }
 
@@ -134,6 +199,8 @@ class WhatsAppService
 
     public function formatForWhatsApp(string $phone): string
     {
-        return $this->formatPhoneNumber($phone).'@c.us';
+        $formatted = $this->formatPhoneNumber($phone);
+
+        return $formatted ? $formatted.'@c.us' : '';
     }
 }

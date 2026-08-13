@@ -30,9 +30,9 @@
             <label class="ml-2 text-sm font-semibold text-slate-600" for="customCheck">Ingat Saya</label>
         </div>
 
-        <div>
+        <div class="overflow-hidden">
             <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+            <div class="g-recaptcha origin-top-left scale-[0.82] min-[380px]:scale-100 h-[64px] min-[380px]:h-[78px]" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
             @error('g-recaptcha-response')
                 <p class="mt-1 text-sm text-red-600 font-medium">{{ $message }}</p>
             @enderror

@@ -7,3 +7,7 @@
 @theme {
   --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
 }
+
+[x-cloak] {
+  display: none !important;
+}

@@ -118,18 +118,30 @@
             });
         }
 
-        document.getElementById('test-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const phone = document.getElementById('test-phone').value;
-            const message = document.getElementById('test-message').value;
+        const testForm = document.getElementById('test-form');
 
-            if (!phone || !message) {
-                alert('Please fill in both phone and message');
-                return;
-            }
+        if (testForm) {
+            testForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            sendTestMessage(phone, message);
-        });
+                const phoneInput = document.getElementById('test-phone');
+                const messageInput = document.getElementById('test-message');
+
+                if (!phoneInput || !messageInput) {
+                    return;
+                }
+
+                const phone = phoneInput.value;
+                const message = messageInput.value;
+
+                if (!phone || !message) {
+                    alert('Please fill in both phone and message');
+                    return;
+                }
+
+                sendTestMessage(phone, message);
+            });
+        }
     </script>
     @endpush
 </x-app-layout>

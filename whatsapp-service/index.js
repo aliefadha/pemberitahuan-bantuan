@@ -3,13 +3,10 @@ const cors = require('cors');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const path = require('path');
-const { createIncomingMessageHandler } = require('./message-handler');
-const { sendTrackedMessage } = require('./send-message');
+const fs = require('fs');
 
 const app = express();
-const PORT = Number(process.env.WHATSAPP_SERVICE_PORT ?? 3001);
-const LARAVEL_APP_URL = process.env.LARAVEL_APP_URL ?? 'http://localhost:8000';
-const WEBHOOK_SECRET = process.env.WHATSAPP_WEBHOOK_SECRET ?? '';
+const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -19,10 +16,7 @@ let qrCodeImage = null;
 let clientStatus = 'disconnected';
 let client = null;
 
-const handleIncomingMessage = createIncomingMessageHandler({
-    laravelAppUrl: LARAVEL_APP_URL,
-    webhookSecret: WEBHOOK_SECRET
-});
+const SESSION_FILE = path.join(__dirname, 'session.json');
 
 function initClient() {
     client = new Client({
@@ -38,7 +32,7 @@ function initClient() {
     client.on('qr', async (qr) => {
         console.log('QR Code received');
         qrCodeData = qr;
-        
+
         try {
             qrCodeImage = await QRCode.toDataURL(qr);
             console.log('QR Code generated');
@@ -70,8 +64,8 @@ function initClient() {
         client = null;
     });
 
-    client.on('message', async (msg) => {
-        await handleIncomingMessage(msg);
+    client.on('message', (msg) => {
+        console.log('Message received:', msg.body);
     });
 
     client.initialize();
@@ -126,18 +120,12 @@ app.post('/send', async (req, res) => {
 
     try {
         const chatId = phone.includes('@c.us') ? phone : `${phone}@c.us`;
-        const { messageId } = await sendTrackedMessage(client, chatId, message);
+        await client.sendMessage(chatId, message);
 
-        if (!messageId) {
-            throw new Error('WhatsApp did not return a message ID');
-        }
-        
         console.log(`Message sent to ${phone}`);
         res.json({
             success: true,
-            message: 'Message sent successfully',
-            message_id: messageId,
-            chat_id: chatId
+            message: 'Message sent successfully'
         });
     } catch (error) {
         console.error('Send message failed:', error);
@@ -156,7 +144,7 @@ app.post('/restart', async (req, res) => {
     clientStatus = 'disconnected';
     qrCodeData = null;
     qrCodeImage = null;
-    
+
     setTimeout(() => {
         initClient();
     }, 1000);
@@ -183,8 +171,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`WhatsApp Service running on http://localhost:${PORT}`);
     console.log(`Status: ${clientStatus}`);
-
-    if (!WEBHOOK_SECRET) {
-        console.warn('WHATSAPP_WEBHOOK_SECRET is not configured; incoming replies will be rejected.');
-    }
 });

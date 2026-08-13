@@ -42,7 +42,9 @@ return [
 
     'whatsapp' => [
         'url' => env('WHATSAPP_SERVICE_URL', 'http://localhost:3001'),
+        'token' => env('WHATSAPP_SERVICE_TOKEN'),
         'webhook_secret' => env('WHATSAPP_WEBHOOK_SECRET'),
+        'activity_link_expiration' => (int) env('WHATSAPP_ACTIVITY_LINK_EXPIRATION', 10080),
     ],
 
 ];

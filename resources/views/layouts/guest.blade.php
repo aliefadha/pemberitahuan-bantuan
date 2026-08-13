@@ -20,7 +20,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-b from-amber-50/30 via-white to-amber-50/10 text-slate-800 min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 relative">
+<body class="bg-gradient-to-b from-amber-50/30 via-white to-amber-50/10 text-slate-800 min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 relative overflow-x-hidden">
 
     <!-- Decorative Top Accent -->
     <div class="absolute top-0 inset-x-0 h-1.5 bg-amber-200"></div>
@@ -29,7 +29,7 @@
     <div class="absolute top-24 left-1/4 w-96 h-96 bg-amber-100/20 rounded-full blur-3xl -z-10 pointer-events-none"></div>
     <div class="absolute top-48 right-1/4 w-80 h-80 bg-amber-100/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
-    <div class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <div class="min-h-screen flex flex-col items-center justify-center px-3 py-8 sm:px-4 sm:py-12">
         <div class="w-full max-w-md">
 
             <!-- Logo Section -->
@@ -43,7 +43,7 @@
             </div>
 
             <!-- Card Box -->
-            <div class="bg-white rounded-[2rem] shadow-xl border border-amber-100/80 p-8 sm:p-10 relative overflow-hidden">
+            <div class="bg-white rounded-[2rem] shadow-xl border border-amber-100/80 p-5 sm:p-10 relative overflow-hidden">
                 <div class="text-center mb-6">
                     <h1 class="text-2xl font-bold text-slate-900 tracking-tight">{{ $title ?? '' }}</h1>
                 </div>

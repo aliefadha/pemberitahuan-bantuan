@@ -18,11 +18,11 @@
     @endif
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 flex flex-row items-center justify-between">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
             <h3 class="text-lg font-semibold text-gray-800 shrink-0">Daftar Kelompok</h3>
-            <div class="flex items-center gap-2">
-                <form method="GET" action="{{ route('admin.kelompoks.index') }}" class="flex items-center gap-2">
-                    <div class="relative">
+            <div class="flex w-full flex-col sm:flex-row sm:flex-wrap sm:items-center xl:w-auto gap-2">
+                <form method="GET" action="{{ route('admin.kelompoks.index') }}" class="flex min-w-0 flex-1 items-center gap-2">
+                    <div class="relative min-w-0 flex-1">
                         <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
@@ -34,7 +34,7 @@
                             id="kelompok-search"
                             value="{{ request('search') }}"
                             placeholder="Cari nama kelompok..."
-                            class="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent w-64"
+                            class="w-full sm:min-w-64 pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
                         />
                     </div>
                     @if(request('search'))
@@ -43,14 +43,14 @@
                         </a>
                     @endif
                 </form>
-                <a href="{{ route('admin.kelompoks.exportPdf') }}" class="inline-flex items-center gap-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition" title="Export semua kelompok ke PDF">
+                <a href="{{ route('admin.kelompoks.exportPdf') }}" class="inline-flex items-center justify-center gap-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition" title="Export semua kelompok ke PDF">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                     Export PDF
                 </a>
                 @unless(auth()->user()->isKader())
-                    <a href="{{ route('admin.kelompoks.create') }}" class="inline-flex items-center gap-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
+                    <a href="{{ route('admin.kelompoks.create') }}" class="inline-flex items-center justify-center gap-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>

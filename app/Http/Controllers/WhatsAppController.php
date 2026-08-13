@@ -72,11 +72,10 @@ class WhatsAppController extends Controller
             $request->phone,
             $request->message
         );
-        $success = $result !== null;
 
         return response()->json([
-            'success' => $success,
-            'message' => $success ? 'Message sent successfully' : 'Failed to send message',
+            'success' => $result,
+            'message' => $result ? 'Message sent successfully' : 'Failed to send message',
         ]);
     }
 }

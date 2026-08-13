@@ -21,7 +21,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-b from-amber-50/30 via-white to-amber-50/10 text-slate-800 min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900">
+<body class="bg-gradient-to-b from-amber-50/30 via-white to-amber-50/10 text-slate-800 min-h-screen antialiased selection:bg-amber-100 selection:text-amber-900 overflow-x-hidden">
 
     <!-- Decorative Top Accent -->
     <div class="absolute top-0 inset-x-0 h-1.5 bg-amber-200"></div>
@@ -32,7 +32,7 @@
 
     <!-- Navigation Header -->
     <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <nav class="flex items-center justify-between bg-white/70 backdrop-blur-md px-6 py-4 rounded-2xl border border-amber-100/30 shadow-sm">
+        <nav class="flex items-center justify-between gap-3 bg-white/70 backdrop-blur-md px-4 sm:px-6 py-3 sm:py-4 rounded-2xl border border-amber-100/30 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-amber-100/80 border border-amber-200/50 flex items-center justify-center shadow-sm">
                     <svg class="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="text-xl font-bold tracking-tight text-slate-900">DASAWISMA</span>
+                    <span class="text-base sm:text-xl font-bold tracking-tight text-slate-900">DASAWISMA</span>
                 </div>
             </div>
 
@@ -51,8 +51,8 @@
                             Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-xl text-amber-900 bg-amber-100/80 hover:bg-amber-200 border border-amber-200/60 shadow-sm hover:scale-[1.01] active:scale-[0.99] transition duration-200">
-                            Login Ke Aplikasi
+                        <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-3 sm:px-5 py-2.5 text-sm font-semibold rounded-xl text-amber-900 bg-amber-100/80 hover:bg-amber-200 border border-amber-200/60 shadow-sm hover:scale-[1.01] active:scale-[0.99] transition duration-200">
+                            <span class="sm:hidden">Login</span><span class="hidden sm:inline">Login Ke Aplikasi</span>
                         </a>
                     @endauth
                 @endif
@@ -64,7 +64,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
 
         <!-- Hero Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-14 sm:mb-20">
             <!-- Left Side: Hero Text -->
             <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-100">
@@ -72,7 +72,7 @@
                     Sistem Informasi Dasawisma
                 </span>
 
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-none">
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight sm:leading-none">
                     Aplikasi Pengelolaan Data <br class="hidden sm:inline" />
                     <span class="text-amber-600">Dasawisma</span> Berbasis Web
                 </h1>
@@ -109,9 +109,9 @@
 
         <!-- Stats Section -->
         <section class="mb-24">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <!-- Card 1: Data Anggota -->
-                <div class="group relative bg-white/80 hover:bg-white p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
+                <div class="group relative bg-white/80 hover:bg-white p-5 sm:p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
                     <div class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 flex items-center justify-center text-2xl transition duration-300">
                         👥
                     </div>
@@ -123,7 +123,7 @@
                 </div>
 
                 <!-- Card 2: Data Keluarga -->
-                <div class="group relative bg-white/80 hover:bg-white p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
+                <div class="group relative bg-white/80 hover:bg-white p-5 sm:p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
                     <div class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 flex items-center justify-center text-2xl transition duration-300">
                         🏠
                     </div>
@@ -135,7 +135,7 @@
                 </div>
 
                 <!-- Card 3: Broadcast Message -->
-                <div class="group relative bg-white/80 hover:bg-white p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
+                <div class="group relative bg-white/80 hover:bg-white p-5 sm:p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
                     <div class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 flex items-center justify-center text-2xl transition duration-300">
                         📢
                     </div>
@@ -147,7 +147,7 @@
                 </div>
 
                 <!-- Card 4: Laporan -->
-                <div class="group relative bg-white/80 hover:bg-white p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
+                <div class="group relative bg-white/80 hover:bg-white p-5 sm:p-6 rounded-3xl border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-amber-100/30 hover:-translate-y-1 transition duration-300">
                     <div class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-amber-50 group-hover:bg-amber-100/80 flex items-center justify-center text-2xl transition duration-300">
                         📊
                     </div>
@@ -164,7 +164,7 @@
         <section id="tentang" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch mb-16 scroll-mt-24">
 
             <!-- About Section -->
-            <div class="lg:col-span-7 flex flex-col justify-between bg-white p-8 sm:p-10 rounded-[2rem] border border-amber-100/80 shadow-sm shadow-amber-100/20">
+            <div class="lg:col-span-7 flex flex-col justify-between bg-white p-6 sm:p-10 rounded-[2rem] border border-amber-100/80 shadow-sm shadow-amber-100/20">
                 <div class="space-y-6">
                     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200/30 text-xs font-extrabold uppercase tracking-widest">
                         ℹ️ Tentang Aplikasi
@@ -188,7 +188,7 @@
             </div>
 
             <!-- Features Section -->
-            <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 sm:p-10 rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-between">
+            <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 sm:p-10 rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-between">
                 <!-- Decorative background light pattern -->
                 <div class="absolute top-0 right-0 w-64 h-64 bg-amber-100/5 rounded-full blur-3xl pointer-events-none"></div>
 
