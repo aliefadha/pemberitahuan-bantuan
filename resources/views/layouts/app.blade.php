@@ -90,7 +90,10 @@
                             </div>
 
                             <div x-data="{ open: false }" class="relative">
-                                <button @click="open = !open" class="flex items-center gap-2 p-2 text-gray-400 hover:text-gray-500">
+                                <button @click="open = !open" class="flex items-center gap-2 p-2 text-gray-400 hover:text-gray-500" aria-label="Open user menu" :aria-expanded="open">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
                                     <span class="hidden sm:block text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
                                 </button>
 

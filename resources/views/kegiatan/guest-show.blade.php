@@ -1,4 +1,4 @@
-<x-guest-layout title="Konfirmasi Kehadiran" max-width="2xl">
+<x-guest-layout title="Konfirmasi Kehadiran" max-width="lg">
 
     @if(session('success'))
         <div class="mb-5 rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-medium text-green-800">
@@ -6,7 +6,7 @@
         </div>
     @endif
 
-    <div class="grid min-w-0 gap-6 md:grid-cols-2 md:items-start">
+    <div class="mx-auto flex min-w-0 w-full max-w-lg flex-col gap-5">
         <section class="min-w-0 space-y-4" aria-labelledby="event-title">
             <div>
                 <p class="break-words text-sm text-slate-500">Halo, {{ $recipient->name }}</p>
